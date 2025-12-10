@@ -1,9 +1,9 @@
 # SWP391-BL5-WRSM
-# Hệ Thống Quản Lý Bảo Hành Thiết Bị Điện Tử
+# Hệ Thống Quản Lý Bảo Hành và Sửa Chữa 
 
 ## Mô tả Dự án
 
-Đây là một hệ thống quản lý bảo hành thiết bị điện tử được xây dựng bằng Java, JSP, và Servlet. Hệ thống cho phép quản lý toàn bộ quy trình bảo hành từ lúc tiếp nhận, phân công kỹ thuật viên, sửa chữa, quản lý kho linh kiện, đến khi giao hàng cho khách hàng.
+Đây là một hệ thống quản lý bảo hành và sửa chứa được xây dựng bằng Java, JSP, và Servlet. Hệ thống cho phép quản lý toàn bộ quy trình bảo hành từ lúc tiếp nhận, phân công kỹ thuật viên, sửa chữa, quản lý kho linh kiện, đến khi giao hàng cho khách hàng.
 
 ## Tính năng chính
 
