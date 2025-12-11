@@ -1,0 +1,15 @@
+# Docker Volumes
+mysql_data/
+upload_data/
+
+# Logs
+logs/
+*.log
+
+# Backup files
+backup_*.sql
+
+# Temp files
+*.tmp
+.DS_Store
+Thumbs.db

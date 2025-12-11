@@ -39,33 +39,17 @@ public class LoginServlet extends HttpServlet {
 
         User user = userDAO.getUserByUsername(username);
 
-        if (user != null) {
-            // Debug logging
-            System.out.println("User found: " + user.getUsername());
-            System.out.println("Input password: " + password);
-            System.out.println("Stored hash: " + user.getPasswordHash());
-            
-            boolean passwordMatch = PasswordUtil.verifyPassword(password, user.getPasswordHash());
-            System.out.println("Password match: " + passwordMatch);
-            
-            // Temporary: Allow login with plain password for testing
-            if (passwordMatch || password.equals("Admin@123") || password.equals("Manager@123") || 
-                password.equals("Tech@123") || password.equals("Warehouse@123")) {
-                
-                HttpSession session = request.getSession();
-                session.setAttribute("user", user);
-                session.setAttribute("userId", user.getUserId());
-                session.setAttribute("username", user.getUsername());
-                session.setAttribute("fullName", user.getFullName());
-                session.setAttribute("role", user.getRole().name());
+        if (user != null && PasswordUtil.verifyPassword(password, user.getPasswordHash())) {
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            session.setAttribute("userId", user.getUserId());
+            session.setAttribute("username", user.getUsername());
+            session.setAttribute("fullName", user.getFullName());
+            session.setAttribute("role", user.getRole().name());
 
-                // Redirect based on role
-                String redirectUrl = getRedirectUrlByRole(user.getRole());
-                response.sendRedirect(request.getContextPath() + redirectUrl);
-            } else {
-                request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
-            }
+            // Redirect based on role
+            String redirectUrl = getRedirectUrlByRole(user.getRole());
+            response.sendRedirect(request.getContextPath() + redirectUrl);
         } else {
             request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
@@ -75,13 +59,13 @@ public class LoginServlet extends HttpServlet {
     private String getRedirectUrlByRole(User.UserRole role) {
         switch (role) {
             case ADMIN:
-                return "/admin/dashboard";
+                return "/views/admin/dashboard.jsp";
             case TECH_MANAGER:
                 return "/tech-manager/dashboard";
             case TECHNICIAN:
                 return "/technician/dashboard";
             case WAREHOUSE:
-                return "/warehouse/dashboard";
+                return "/views/warehouse/dashboard.jsp";
             case CUSTOMER:
                 return "/customer/track-ticket";
             default:

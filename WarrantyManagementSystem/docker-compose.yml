@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: warranty_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: warranty_system
+      MYSQL_USER: warranty_user
+      MYSQL_PASSWORD: warranty_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      # Mount volume để persist data - QUAN TRỌNG: Data sẽ không mất khi rebuild
+      - mysql_data:/var/lib/mysql
+      # Mount init script để tự động tạo database schema
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    networks:
+      - warranty_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Tomcat Web Application Service
+  web:
+    build: .
+    container_name: warranty_web
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Database connection environment variables
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: warranty_system
+      DB_USER: warranty_user
+      DB_PASSWORD: warranty_pass
+    volumes:
+      # Mount upload directory để persist uploaded files
+      - upload_data:/usr/local/tomcat/webapps/ROOT/uploads
+      # Mount logs directory
+      - ./logs:/usr/local/tomcat/logs
+    networks:
+      - warranty_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Volumes để persist data
+volumes:
+  mysql_data:
+    driver: local
+  upload_data:
+    driver: local
+
+# Network
+networks:
+  warranty_network:
+    driver: bridge

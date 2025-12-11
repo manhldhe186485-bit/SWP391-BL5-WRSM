@@ -1,0 +1,41 @@
+# ====================================
+# .dockerignore
+# Các file/folder không cần copy vào Docker image
+# ====================================
+
+# Maven
+target/
+!target/warranty-system.war
+
+# IDE
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+src/test/
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
