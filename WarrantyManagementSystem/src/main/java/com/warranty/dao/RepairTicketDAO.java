@@ -323,4 +323,93 @@ public class RepairTicketDAO {
         
         return ticket;
     }
+    
+    /**
+     * Get ticket by ticket code/number
+     */
+    public RepairTicket getTicketByCode(String ticketCode) {
+        String sql = "SELECT * FROM repair_tickets WHERE ticket_number = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, ticketCode);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return extractTicketFromResultSet(rs);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * Count tickets by year (for generating ticket number)
+     */
+    public int countTicketsByYear(int year) {
+        String sql = "SELECT COUNT(*) FROM repair_tickets WHERE YEAR(received_date) = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, year);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Get tickets by technician and status
+     */
+    public List<RepairTicket> getTicketsByTechnicianAndStatus(int technicianId, String status) throws SQLException {
+        String sql = "SELECT * FROM repair_tickets WHERE assigned_technician_id = ? AND status = ? ORDER BY received_date DESC";
+        List<RepairTicket> tickets = new ArrayList<>();
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, technicianId);
+            stmt.setString(2, status);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                RepairTicket ticket = extractTicketFromResultSet(rs);
+                tickets.add(ticket);
+            }
+        }
+        
+        return tickets;
+    }
+
+    /**
+     * Update invoice information for a ticket
+     */
+    public boolean updateInvoiceInfo(int ticketId, java.math.BigDecimal serviceCharge, 
+                                   java.math.BigDecimal partsCharge, java.math.BigDecimal totalCost, 
+                                   String notes) throws SQLException {
+        String sql = "UPDATE repair_tickets SET service_charge = ?, parts_charge = ?, total_cost = ?, " +
+                    "invoice_notes = ?, status = 'Invoiced' WHERE ticket_id = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setBigDecimal(1, serviceCharge);
+            stmt.setBigDecimal(2, partsCharge);
+            stmt.setBigDecimal(3, totalCost);
+            stmt.setString(4, notes);
+            stmt.setInt(5, ticketId);
+            
+            return stmt.executeUpdate() > 0;
+        }
+    }
 }
