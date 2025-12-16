@@ -165,6 +165,68 @@ public class ProductSerial {
         this.customer = customer;
     }
 
+    // Delegate methods to related objects
+    public int getWarrantyMonths() {
+        if (product != null) {
+            return product.getWarrantyPeriodMonths();
+        }
+        return 12; // default
+    }
+
+    public void setWarrantyMonths(int warrantyMonths) {
+        if (product != null) {
+            product.setWarrantyPeriodMonths(warrantyMonths);
+        }
+    }
+
+    public String getProductName() {
+        if (product != null) {
+            return product.getProductName();
+        }
+        return null;
+    }
+
+    public void setProductName(String productName) {
+        // Helper method - product name is set through product object
+        // This is a no-op setter for compatibility
+    }
+
+    public String getCustomerName() {
+        if (customer != null) {
+            return customer.getFullName();
+        }
+        return null;
+    }
+
+    public void setCustomerName(String customerName) {
+        // Helper method - customer name is set through customer object
+        // This is a no-op setter for compatibility
+    }
+
+    public String getCustomerPhone() {
+        if (customer != null) {
+            return customer.getPhone();
+        }
+        return null;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        // Helper method - customer phone is set through customer object
+        // This is a no-op setter for compatibility
+    }
+
+    public String getCustomerEmail() {
+        if (customer != null) {
+            return customer.getEmail();
+        }
+        return null;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        // Helper method - customer email is set through customer object
+        // This is a no-op setter for compatibility
+    }
+
     @Override
     public String toString() {
         return "ProductSerial{" +

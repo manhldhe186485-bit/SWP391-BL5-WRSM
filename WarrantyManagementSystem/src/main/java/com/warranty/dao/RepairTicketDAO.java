@@ -2,6 +2,8 @@ package com.warranty.dao;
 
 import com.warranty.model.RepairTicket;
 import com.warranty.model.RepairTicket.*;
+import com.warranty.model.ProductSerial;
+import com.warranty.model.Customer;
 import com.warranty.util.DatabaseUtil;
 
 import java.sql.*;
@@ -217,20 +219,28 @@ public class RepairTicketDAO {
      * Update ticket
      */
     public boolean updateTicket(RepairTicket ticket) {
-        String sql = "UPDATE repair_tickets SET status = ?, priority = ?, estimated_completion_date = ?, " +
-                    "total_cost = ?, labor_cost = ?, parts_cost = ?, notes = ? WHERE ticket_id = ?";
+        String sql = "UPDATE repair_tickets SET assigned_technician_id = ?, status = ?, priority = ?, " +
+                    "estimated_completion_date = ?, total_cost = ?, labor_cost = ?, parts_cost = ?, " +
+                    "notes = ? WHERE ticket_id = ?";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, ticket.getStatus().name());
-            stmt.setString(2, ticket.getPriority().name());
-            stmt.setDate(3, ticket.getEstimatedCompletionDate());
-            stmt.setBigDecimal(4, ticket.getTotalCost());
-            stmt.setBigDecimal(5, ticket.getLaborCost());
-            stmt.setBigDecimal(6, ticket.getPartsCost());
-            stmt.setString(7, ticket.getNotes());
-            stmt.setInt(8, ticket.getTicketId());
+            // Handle NULL for assigned_technician_id
+            if (ticket.getAssignedTechnicianId() != null) {
+                stmt.setInt(1, ticket.getAssignedTechnicianId());
+            } else {
+                stmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            
+            stmt.setString(2, ticket.getStatus().name());
+            stmt.setString(3, ticket.getPriority().name());
+            stmt.setDate(4, ticket.getEstimatedCompletionDate());
+            stmt.setBigDecimal(5, ticket.getTotalCost());
+            stmt.setBigDecimal(6, ticket.getLaborCost());
+            stmt.setBigDecimal(7, ticket.getPartsCost());
+            stmt.setString(8, ticket.getNotes());
+            stmt.setInt(9, ticket.getTicketId());
             
             return stmt.executeUpdate() > 0;
             
@@ -412,4 +422,63 @@ public class RepairTicketDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+
+    /**
+     * Count active tickets by technician
+     */
+    public int countActiveTicketsByTechnician(int technicianId) {
+        String sql = "SELECT COUNT(*) FROM repair_tickets WHERE assigned_technician_id = ? " +
+                    "AND status NOT IN ('COMPLETED', 'DELIVERED', 'CANCELLED')";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, technicianId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Load related objects (ProductSerial, Customer) for a ticket
+     */
+    public void loadRelatedObjects(RepairTicket ticket) {
+        if (ticket == null) return;
+        
+        ProductSerialDAO serialDAO = new ProductSerialDAO();
+        CustomerDAO customerDAO = new CustomerDAO();
+        
+        try {
+            // Load ProductSerial
+            if (ticket.getSerialId() > 0) {
+                ticket.setProductSerial(serialDAO.getBySerialId(ticket.getSerialId()));
+            }
+            
+            // Load Customer
+            if (ticket.getCustomerId() > 0) {
+                ticket.setCustomer(customerDAO.getCustomerById(ticket.getCustomerId()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Load related objects for a list of tickets
+     */
+    public void loadRelatedObjects(List<RepairTicket> tickets) {
+        if (tickets == null || tickets.isEmpty()) return;
+        
+        for (RepairTicket ticket : tickets) {
+            loadRelatedObjects(ticket);
+        }
+    }
 }
+

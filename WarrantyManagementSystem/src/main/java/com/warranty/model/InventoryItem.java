@@ -137,6 +137,39 @@ public class InventoryItem {
         return quantityInStock <= minStockLevel;
     }
 
+    // Alias methods for backward compatibility
+    public String getPartNumber() {
+        return getItemCode();
+    }
+
+    public void setPartNumber(String partNumber) {
+        setItemCode(partNumber);
+    }
+
+    public String getPartName() {
+        return getItemName();
+    }
+
+    public void setPartName(String partName) {
+        setItemName(partName);
+    }
+
+    public int getQuantityAvailable() {
+        return getQuantityInStock();
+    }
+
+    public void setQuantityAvailable(int quantityAvailable) {
+        setQuantityInStock(quantityAvailable);
+    }
+
+    public int getMinQuantity() {
+        return getMinStockLevel();
+    }
+
+    public void setMinQuantity(int minQuantity) {
+        setMinStockLevel(minQuantity);
+    }
+
     @Override
     public String toString() {
         return "InventoryItem{" +

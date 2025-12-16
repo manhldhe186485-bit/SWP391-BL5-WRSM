@@ -118,6 +118,56 @@ public class PartsRequestItem {
         return BigDecimal.ZERO;
     }
 
+    // Delegate methods for backward compatibility
+    public int getInventoryItemId() {
+        return getItemId();
+    }
+
+    public void setInventoryItemId(int inventoryItemId) {
+        setItemId(inventoryItemId);
+    }
+
+    public String getPartName() {
+        if (inventoryItem != null) {
+            return inventoryItem.getItemName();
+        }
+        return null;
+    }
+
+    public void setPartName(String partName) {
+        // Helper method - part name is set through inventoryItem object
+        // This is a no-op setter for compatibility
+    }
+
+    public String getPartNumber() {
+        if (inventoryItem != null) {
+            return inventoryItem.getItemCode();
+        }
+        return null;
+    }
+
+    public void setPartNumber(String partNumber) {
+        // Helper method - part number is set through inventoryItem object
+        // This is a no-op setter for compatibility
+    }
+
+    public void setPartCode(String partCode) {
+        // Helper method - part code is handled through inventoryItem
+        // This is a no-op setter for compatibility
+    }
+
+    public int getQuantityAvailable() {
+        if (inventoryItem != null) {
+            return inventoryItem.getQuantityInStock();
+        }
+        return 0;
+    }
+
+    public void setQuantityAvailable(int quantityAvailable) {
+        // Helper method - quantity available is set through inventoryItem object
+        // This is a no-op setter for compatibility
+    }
+
     @Override
     public String toString() {
         return "PartsRequestItem{" +

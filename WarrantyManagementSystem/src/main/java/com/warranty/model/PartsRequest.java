@@ -173,6 +173,52 @@ public class PartsRequest {
         this.items = items;
     }
 
+    // Compatibility methods
+    public String getPriority() {
+        return "MEDIUM"; // default priority
+    }
+
+    public void setPriority(String priority) {
+        // No-op method for compatibility
+    }
+
+    public Integer getRequestedBy() {
+        return getTechnicianId();
+    }
+
+    public void setRequestedBy(Integer requestedBy) {
+        if (requestedBy != null) {
+            setTechnicianId(requestedBy);
+        }
+    }
+
+    public void setProcessedBy(int processedBy) {
+        setWarehouseStaffId(processedBy);
+    }
+
+    public void setProcessedDate(Timestamp processedDate) {
+        setApprovedDate(processedDate);
+    }
+
+    public void setProcessingNotes(String processingNotes) {
+        setNotes(processingNotes);
+    }
+
+    public void setTechnicianName(String technicianName) {
+        // Helper method - technician name is set through technician object
+        // This is a no-op setter for compatibility
+    }
+
+    public void setTicketCode(String ticketCode) {
+        // Helper method - ticket code is handled through ticket ID
+        // This is a no-op setter for compatibility
+    }
+
+    public void setProductSerialNumber(String productSerialNumber) {
+        // Helper method - product serial is handled through ticket relation
+        // This is a no-op setter for compatibility
+    }
+
     @Override
     public String toString() {
         return "PartsRequest{" +

@@ -76,8 +76,7 @@ public class PartsRequestDAO {
      * Lấy yêu cầu linh kiện theo ID (kèm items)
      */
     public PartsRequest getRequestById(int requestId) throws SQLException {
-        String sql = "SELECT pr.*, u.full_name as technician_name, rt.ticket_code, " +
-                     "rt.product_serial_number " +
+        String sql = "SELECT pr.*, u.full_name as technician_name, rt.ticket_number " +
                      "FROM parts_requests pr " +
                      "LEFT JOIN users u ON pr.technician_id = u.user_id " +
                      "LEFT JOIN repair_tickets rt ON pr.ticket_id = rt.ticket_id " +
@@ -139,7 +138,7 @@ public class PartsRequestDAO {
      */
     public List<PartsRequest> getRequestsByTechnician(int technicianId) throws SQLException {
         List<PartsRequest> list = new ArrayList<>();
-        String sql = "SELECT pr.*, rt.ticket_code, rt.product_serial_number " +
+        String sql = "SELECT pr.*, rt.ticket_number " +
                      "FROM parts_requests pr " +
                      "LEFT JOIN repair_tickets rt ON pr.ticket_id = rt.ticket_id " +
                      "WHERE pr.technician_id = ? " +
@@ -197,8 +196,7 @@ public class PartsRequestDAO {
             inClause.append("?");
         }
         
-        String sql = "SELECT pr.*, u.full_name as technician_name, rt.ticket_code, " +
-                     "rt.product_serial_number " +
+        String sql = "SELECT pr.*, u.full_name as technician_name, rt.ticket_number " +
                      "FROM parts_requests pr " +
                      "LEFT JOIN users u ON pr.technician_id = u.user_id " +
                      "LEFT JOIN repair_tickets rt ON pr.ticket_id = rt.ticket_id " +
@@ -369,11 +367,8 @@ public class PartsRequestDAO {
         if (hasColumn(rs, "technician_name")) {
             pr.setTechnicianName(rs.getString("technician_name"));
         }
-        if (hasColumn(rs, "ticket_code")) {
-            pr.setTicketCode(rs.getString("ticket_code"));
-        }
-        if (hasColumn(rs, "product_serial_number")) {
-            pr.setProductSerialNumber(rs.getString("product_serial_number"));
+        if (hasColumn(rs, "ticket_number")) {
+            pr.setTicketCode(rs.getString("ticket_number"));
         }
         
         return pr;

@@ -13,7 +13,7 @@ public class ProductSerialDAO {
      * Lấy thông tin serial product theo số serial
      */
     public ProductSerial getBySerialNumber(String serialNumber) throws SQLException {
-        String sql = "SELECT ps.*, p.name as product_name, p.category, p.brand, " +
+        String sql = "SELECT ps.*, p.product_name, p.category, p.brand, " +
                      "c.full_name as customer_name, c.phone as customer_phone, c.email as customer_email " +
                      "FROM product_serials ps " +
                      "LEFT JOIN products p ON ps.product_id = p.product_id " +
@@ -35,7 +35,47 @@ public class ProductSerialDAO {
                 ps.setPurchaseDate(rs.getDate("purchase_date"));
                 ps.setWarrantyStartDate(rs.getDate("warranty_start_date"));
                 ps.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                ps.setWarrantyMonths(rs.getInt("warranty_months"));
+                ps.setNotes(rs.getString("notes"));
+                ps.setCreatedAt(rs.getTimestamp("created_at"));
+                
+                // Additional info
+                ps.setProductName(rs.getString("product_name"));
+                ps.setCustomerName(rs.getString("customer_name"));
+                ps.setCustomerPhone(rs.getString("customer_phone"));
+                ps.setCustomerEmail(rs.getString("customer_email"));
+                
+                return ps;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get product serial by serial_id
+     */
+    public ProductSerial getBySerialId(int serialId) throws SQLException {
+        String sql = "SELECT ps.*, p.product_name, p.category, p.brand, " +
+                     "c.full_name as customer_name, c.phone as customer_phone, c.email as customer_email " +
+                     "FROM product_serials ps " +
+                     "LEFT JOIN products p ON ps.product_id = p.product_id " +
+                     "LEFT JOIN customers c ON ps.customer_id = c.customer_id " +
+                     "WHERE ps.serial_id = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, serialId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                ProductSerial ps = new ProductSerial();
+                ps.setSerialId(rs.getInt("serial_id"));
+                ps.setProductId(rs.getInt("product_id"));
+                ps.setSerialNumber(rs.getString("serial_number"));
+                ps.setCustomerId(rs.getInt("customer_id"));
+                ps.setPurchaseDate(rs.getDate("purchase_date"));
+                ps.setWarrantyStartDate(rs.getDate("warranty_start_date"));
+                ps.setWarrantyEndDate(rs.getDate("warranty_end_date"));
                 ps.setNotes(rs.getString("notes"));
                 ps.setCreatedAt(rs.getTimestamp("created_at"));
                 
@@ -87,7 +127,6 @@ public class ProductSerialDAO {
                 ps.setPurchaseDate(rs.getDate("purchase_date"));
                 ps.setWarrantyStartDate(rs.getDate("warranty_start_date"));
                 ps.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                ps.setWarrantyMonths(rs.getInt("warranty_months"));
                 ps.setCustomerName(rs.getString("customer_name"));
                 ps.setCustomerPhone(rs.getString("customer_phone"));
                 
@@ -102,20 +141,19 @@ public class ProductSerialDAO {
      */
     public boolean create(ProductSerial productSerial) throws SQLException {
         String sql = "INSERT INTO product_serials (product_id, serial_number, customer_id, " +
-                     "purchase_date, warranty_start_date, warranty_end_date, warranty_months, notes) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                     "purchase_date, warranty_start_date, warranty_end_date, notes) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             stmt.setInt(1, productSerial.getProductId());
             stmt.setString(2, productSerial.getSerialNumber());
-            stmt.setObject(3, productSerial.getCustomerId() == 0 ? null : productSerial.getCustomerId());
+            stmt.setInt(3, productSerial.getCustomerId());
             stmt.setDate(4, productSerial.getPurchaseDate());
             stmt.setDate(5, productSerial.getWarrantyStartDate());
             stmt.setDate(6, productSerial.getWarrantyEndDate());
-            stmt.setInt(7, productSerial.getWarrantyMonths());
-            stmt.setString(8, productSerial.getNotes());
+            stmt.setString(7, productSerial.getNotes());
             
             int affected = stmt.executeUpdate();
             
@@ -174,7 +212,7 @@ public class ProductSerialDAO {
      */
     public List<ProductSerial> getAll() throws SQLException {
         List<ProductSerial> list = new ArrayList<>();
-        String sql = "SELECT ps.*, p.name as product_name, c.full_name as customer_name " +
+        String sql = "SELECT ps.*, p.product_name, c.full_name as customer_name " +
                      "FROM product_serials ps " +
                      "LEFT JOIN products p ON ps.product_id = p.product_id " +
                      "LEFT JOIN customers c ON ps.customer_id = c.customer_id " +
@@ -193,7 +231,6 @@ public class ProductSerialDAO {
                 ps.setPurchaseDate(rs.getDate("purchase_date"));
                 ps.setWarrantyStartDate(rs.getDate("warranty_start_date"));
                 ps.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                ps.setWarrantyMonths(rs.getInt("warranty_months"));
                 ps.setProductName(rs.getString("product_name"));
                 ps.setCustomerName(rs.getString("customer_name"));
                 
@@ -208,7 +245,7 @@ public class ProductSerialDAO {
      */
     public List<ProductSerial> getByCustomerId(int customerId) throws SQLException {
         List<ProductSerial> list = new ArrayList<>();
-        String sql = "SELECT ps.*, p.name as product_name " +
+        String sql = "SELECT ps.*, p.product_name " +
                      "FROM product_serials ps " +
                      "LEFT JOIN products p ON ps.product_id = p.product_id " +
                      "WHERE ps.customer_id = ? ORDER BY ps.purchase_date DESC";
@@ -228,7 +265,6 @@ public class ProductSerialDAO {
                 ps.setPurchaseDate(rs.getDate("purchase_date"));
                 ps.setWarrantyStartDate(rs.getDate("warranty_start_date"));
                 ps.setWarrantyEndDate(rs.getDate("warranty_end_date"));
-                ps.setWarrantyMonths(rs.getInt("warranty_months"));
                 ps.setProductName(rs.getString("product_name"));
                 
                 list.add(ps);

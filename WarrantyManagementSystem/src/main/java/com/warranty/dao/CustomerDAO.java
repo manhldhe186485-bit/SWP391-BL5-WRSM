@@ -11,7 +11,7 @@ public class CustomerDAO {
 
     public List<Customer> getAllCustomers() throws SQLException {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT * FROM customers ORDER BY created_date DESC";
+        String sql = "SELECT * FROM customers ORDER BY created_at DESC";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -22,9 +22,9 @@ public class CustomerDAO {
                 customer.setCustomerId(rs.getInt("customer_id"));
                 customer.setFullName(rs.getString("full_name"));
                 customer.setEmail(rs.getString("email"));
-                customer.setPhone(rs.getString("phone_number"));
+                customer.setPhone(rs.getString("phone"));
                 customer.setAddress(rs.getString("address"));
-                customer.setCreatedAt(rs.getTimestamp("created_date"));
+                customer.setCreatedAt(rs.getTimestamp("created_at"));
                 
                 customers.add(customer);
             }
@@ -47,9 +47,9 @@ public class CustomerDAO {
                 customer.setCustomerId(rs.getInt("customer_id"));
                 customer.setFullName(rs.getString("full_name"));
                 customer.setEmail(rs.getString("email"));
-                customer.setPhone(rs.getString("phone_number"));
+                customer.setPhone(rs.getString("phone"));
                 customer.setAddress(rs.getString("address"));
-                customer.setCreatedAt(rs.getTimestamp("created_date"));
+                customer.setCreatedAt(rs.getTimestamp("created_at"));
                 return customer;
             }
         }
@@ -58,17 +58,28 @@ public class CustomerDAO {
     }
 
     public boolean insertCustomer(Customer customer) throws SQLException {
-        String sql = "INSERT INTO customers (full_name, email, phone_number, address, created_date) VALUES (?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO customers (full_name, email, phone, address) VALUES (?, ?, ?, ?)";
         
         try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             stmt.setString(1, customer.getFullName());
             stmt.setString(2, customer.getEmail());
             stmt.setString(3, customer.getPhone());
             stmt.setString(4, customer.getAddress());
             
-            return stmt.executeUpdate() > 0;
+            int result = stmt.executeUpdate();
+            
+            if (result > 0) {
+                // Get generated customer ID
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        customer.setCustomerId(rs.getInt(1));
+                    }
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

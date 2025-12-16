@@ -112,6 +112,23 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
+    // Alias methods for backward compatibility
+    public String getName() {
+        return getProductName();
+    }
+
+    public void setName(String name) {
+        setProductName(name);
+    }
+
+    public int getWarrantyMonths() {
+        return getWarrantyPeriodMonths();
+    }
+
+    public void setWarrantyMonths(int warrantyMonths) {
+        setWarrantyPeriodMonths(warrantyMonths);
+    }
+
     @Override
     public String toString() {
         return "Product{" +

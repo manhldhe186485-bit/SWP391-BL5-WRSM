@@ -49,7 +49,7 @@ public class RepairTicket {
     }
 
     public enum TicketStatus {
-        PENDING_ASSIGNMENT, ASSIGNED, IN_DIAGNOSIS, WAITING_APPROVAL,
+        PENDING, PENDING_ASSIGNMENT, ASSIGNED, IN_DIAGNOSIS, IN_PROGRESS, WAITING_APPROVAL,
         APPROVED, IN_REPAIR, WAITING_PARTS, COMPLETED,
         WAITING_PAYMENT, PAID, DELIVERED, CANCELLED
     }
@@ -296,6 +296,45 @@ public class RepairTicket {
 
     public void setTechManager(User techManager) {
         this.techManager = techManager;
+    }
+
+    // Alias methods for backward compatibility
+    public String getTicketCode() {
+        return getTicketNumber();
+    }
+
+    public void setTicketCode(String ticketCode) {
+        setTicketNumber(ticketCode);
+    }
+
+    public Integer getTechnicianId() {
+        return getAssignedTechnicianId();
+    }
+
+    public void setTechnicianId(int technicianId) {
+        setAssignedTechnicianId(technicianId);
+    }
+
+    public void setTechnicianId(Integer technicianId) {
+        setAssignedTechnicianId(technicianId);
+    }
+
+    public void setReceivedBy(Integer receivedBy) {
+        if (receivedBy != null) {
+            setIntakeTechnicianId(receivedBy);
+        }
+    }
+
+    public boolean getIsUnderWarranty() {
+        return ticketType == TicketType.WARRANTY;
+    }
+
+    public void setIsUnderWarranty(boolean isUnderWarranty) {
+        if (isUnderWarranty) {
+            setTicketType(TicketType.WARRANTY);
+        } else {
+            setTicketType(TicketType.PAID_REPAIR);
+        }
     }
 
     @Override
