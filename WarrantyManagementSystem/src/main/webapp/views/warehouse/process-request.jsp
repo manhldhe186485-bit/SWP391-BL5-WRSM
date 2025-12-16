@@ -179,7 +179,7 @@
             
             <c:if test="${empty pendingRequests}">
                 <p style="text-align: center; color: #999; padding: 40px;">
-                    ✅ Không có yêu cầu nào chờ xử lý
+                    Không có yêu cầu nào chờ xử lý
                 </p>
             </c:if>
 
@@ -241,7 +241,7 @@
                                         <input type="hidden" name="action" value="approve">
                                         <button type="submit" class="btn btn-success" 
                                                 onclick="return confirm('Xác nhận DUYỆT yêu cầu này?')">
-                                            ✅ Duyệt
+                                            Duyệt
                                         </button>
                                     </form>
                                     <button type="button" class="btn btn-danger" 

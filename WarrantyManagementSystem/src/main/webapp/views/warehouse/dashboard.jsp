@@ -113,9 +113,9 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <h1>📦 Kho - Dashboard</h1>
+            <h1>Kho - Dashboard</h1>
             <div class="user-info">
-                <span>👤 ${sessionScope.user.fullName} (${sessionScope.user.role})</span>
+                <span>${sessionScope.user.fullName} (${sessionScope.user.role})</span>
                 <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Đăng Xuất</a>
             </div>
         </div>
@@ -125,35 +125,35 @@
         <!-- Statistics -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>⏳ Yêu Cầu Chờ Duyệt</h3>
+                <h3>Yêu Cầu Chờ Duyệt</h3>
                 <div class="number">${pendingRequestsCount}</div>
             </div>
             <div class="stat-card">
-                <h3>✅ Đã Duyệt Hôm Nay</h3>
+                <h3>Đã Duyệt Hôm Nay</h3>
                 <div class="number">${approvedTodayCount}</div>
             </div>
             <div class="stat-card">
-                <h3>❌ Từ Chối Hôm Nay</h3>
+                <h3>Từ Chối Hôm Nay</h3>
                 <div class="number">${rejectedTodayCount}</div>
             </div>
             <div class="stat-card">
-                <h3>📊 Tổng Yêu Cầu Tháng Này</h3>
+                <h3>Tổng Yêu Cầu Tháng Này</h3>
                 <div class="number">${totalThisMonth}</div>
             </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="actions">
-            <h2>🚀 Thao Tác Nhanh</h2>
+            <h2>Thao Tác Nhanh</h2>
             <div class="action-buttons">
                 <a href="${pageContext.request.contextPath}/warehouse/process-request" class="btn btn-primary">
-                    ⏳ Xử Lý Yêu Cầu Linh Kiện
+                    Xử Lý Yêu Cầu Linh Kiện
                 </a>
                 <a href="${pageContext.request.contextPath}/warehouse/inventory" class="btn btn-secondary">
-                    📦 Quản Lý Kho
+                    Quản Lý Kho
                 </a>
                 <a href="${pageContext.request.contextPath}/warehouse/reports" class="btn btn-secondary">
-                    📊 Báo Cáo & Thống Kê
+                    Báo Cáo & Thống Kê
                 </a>
             </div>
         </div>

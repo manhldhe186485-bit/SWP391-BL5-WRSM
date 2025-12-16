@@ -78,7 +78,7 @@
                     <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp">
                         <i class="fas fa-tasks"></i> Cập nhật tiến độ
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-invoice.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/create-invoice">
                         <i class="fas fa-receipt"></i> Tạo phiếu thanh toán
                     </a>
                     
@@ -124,76 +124,113 @@
 
                 <!-- Tickets List -->
                 <div id="ticketsList">
-                    <!-- Empty State -->
-                    <div class="card shadow-sm">
-                        <div class="card-body text-center py-5">
-                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
-                            <h4 class="text-muted">Chưa có đơn nào được phân công</h4>
-                            <p class="text-muted">
-                                Tech Manager sẽ phân công đơn bảo hành cho bạn.<br>
-                                Các đơn sẽ hiển thị ở đây khi được giao.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Sample Ticket Card (hidden by default, will be populated from backend) -->
-                    <div class="card ticket-card mb-3 d-none" data-status="new">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">
-                                                <span class="badge badge-new me-2">Mới</span>
-                                                #WR-2025-0001
-                                            </h5>
-                                            <p class="text-muted mb-1">
-                                                <i class="fas fa-user"></i> Nguyễn Văn A
-                                                <span class="mx-2">|</span>
-                                                <i class="fas fa-phone"></i> 0123456789
-                                            </p>
-                                        </div>
-                                        <small class="text-muted">
-                                            <i class="far fa-clock"></i> 2 giờ trước
-                                        </small>
-                                    </div>
-                                    
-                                    <div class="mb-2">
-                                        <strong><i class="fas fa-box"></i> Sản phẩm:</strong> 
-                                        iPhone 14 Pro - S/N: ABC123456789
-                                    </div>
-                                    
-                                    <div class="mb-2">
-                                        <strong><i class="fas fa-exclamation-circle"></i> Lỗi:</strong>
-                                        <span class="text-danger">Màn hình không hiển thị</span>
-                                    </div>
-                                    
-                                    <div>
-                                        <small class="text-muted">
-                                            <i class="far fa-calendar"></i> Ngày tiếp nhận: 10/12/2025
-                                        </small>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4 text-end">
-                                    <div class="mb-2">
-                                        <span class="badge bg-info">Còn BH: 8 tháng</span>
-                                    </div>
-                                    <div class="btn-group-vertical w-100">
-                                        <button class="btn btn-sm btn-primary mb-1">
-                                            <i class="fas fa-eye"></i> Xem chi tiết
-                                        </button>
-                                        <button class="btn btn-sm btn-success mb-1">
-                                            <i class="fas fa-file-alt"></i> Tạo phiếu BH
-                                        </button>
-                                        <button class="btn btn-sm btn-info">
-                                            <i class="fas fa-edit"></i> Cập nhật tiến độ
-                                        </button>
-                                    </div>
+                    <c:choose>
+                        <c:when test="${empty tickets}">
+                            <!-- Empty State -->
+                            <div class="card shadow-sm">
+                                <div class="card-body text-center py-5">
+                                    <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                                    <h4 class="text-muted">Chưa có đơn nào được phân công</h4>
+                                    <p class="text-muted">
+                                        Tech Manager sẽ phân công đơn bảo hành cho bạn.<br>
+                                        Các đơn sẽ hiển thị ở đây khi được giao.
+                                    </p>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </c:when>
+                        <c:otherwise>
+                            <!-- Tickets Cards -->
+                            <c:forEach items="${tickets}" var="ticket">
+                                <div class="card ticket-card mb-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div>
+                                                        <h5 class="mb-1">
+                                                            <c:choose>
+                                                                <c:when test="${ticket.status == 'ASSIGNED'}">
+                                                                    <span class="badge badge-new me-2">Mới</span>
+                                                                </c:when>
+                                                                <c:when test="${ticket.status == 'IN_PROGRESS'}">
+                                                                    <span class="badge badge-progress me-2">Đang sửa</span>
+                                                                </c:when>
+                                                                <c:when test="${ticket.status == 'WAITING_PARTS'}">
+                                                                    <span class="badge badge-waiting me-2">Chờ linh kiện</span>
+                                                                </c:when>
+                                                                <c:when test="${ticket.status == 'COMPLETED'}">
+                                                                    <span class="badge badge-completed me-2">Hoàn thành</span>
+                                                                </c:when>
+                                                            </c:choose>
+                                                            ${ticket.ticketNumber}
+                                                        </h5>
+                                                        <p class="text-muted mb-1">
+                                                            <i class="fas fa-user"></i> ${ticket.customer.fullName}
+                                                            <span class="mx-2">|</span>
+                                                            <i class="fas fa-phone"></i> ${ticket.customer.phone}
+                                                        </p>
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        <i class="far fa-clock"></i> ${ticket.receivedDate}
+                                                    </small>
+                                                </div>
+                                                
+                                                <div class="mb-2">
+                                                    <strong><i class="fas fa-box"></i> Sản phẩm:</strong> 
+                                                    ${ticket.productSerial.serialNumber}
+                                                </div>
+                                                
+                                                <div class="mb-2">
+                                                    <strong><i class="fas fa-exclamation-circle"></i> Lỗi:</strong>
+                                                    <span class="text-danger">${ticket.issueDescription}</span>
+                                                </div>
+                                                
+                                                <div>
+                                                    <small class="text-muted">
+                                                        <span class="badge badge-${ticket.priority == 'URGENT' ? 'danger' : ticket.priority == 'HIGH' ? 'warning' : 'secondary'} me-2">
+                                                            ${ticket.priority}
+                                                        </span>
+                                                        ${ticket.ticketType == 'WARRANTY' ? 'Bảo hành' : 'Sửa chữa có phí'}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-4 text-end">
+                                                <c:choose>
+                                                    <c:when test="${ticket.status == 'ASSIGNED'}">
+                                                        <a href="${pageContext.request.contextPath}/technician/update-progress?ticketId=${ticket.ticketId}" 
+                                                           class="btn btn-primary btn-sm mb-2 w-100">
+                                                            <i class="fas fa-play"></i> Bắt đầu sửa
+                                                        </a>
+                                                    </c:when>
+                                                    <c:when test="${ticket.status == 'IN_PROGRESS'}">
+                                                        <a href="${pageContext.request.contextPath}/technician/update-progress?ticketId=${ticket.ticketId}" 
+                                                           class="btn btn-warning btn-sm mb-2 w-100">
+                                                            <i class="fas fa-tools"></i> Cập nhật tiến độ
+                                                        </a>
+                                                    </c:when>
+                                                    <c:when test="${ticket.status == 'WAITING_PARTS'}">
+                                                        <button class="btn btn-secondary btn-sm mb-2 w-100" disabled>
+                                                            <i class="fas fa-hourglass-half"></i> Chờ linh kiện
+                                                        </button>
+                                                    </c:when>
+                                                    <c:when test="${ticket.status == 'COMPLETED'}">
+                                                        <span class="badge badge-success">
+                                                            <i class="fas fa-check-circle"></i> Đã hoàn thành
+                                                        </span>
+                                                    </c:when>
+                                                </c:choose>
+                                                <a href="${pageContext.request.contextPath}/technician/ticket-detail?id=${ticket.ticketId}" 
+                                                   class="btn btn-outline-secondary btn-sm w-100">
+                                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <!-- Pagination -->

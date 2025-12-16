@@ -268,7 +268,7 @@
                             <c:choose>
                                 <c:when test="${ticket.paid}">
                                     <span style="font-weight: bold; color: #28a745;">
-                                        ✅ Đã Thanh Toán
+                                        Đã Thanh Toán
                                     </span>
                                 </c:when>
                                 <c:otherwise>
@@ -283,7 +283,7 @@
 
                 <!-- Timeline -->
                 <div class="timeline">
-                    <h3>📊 Lịch Sử Tiến Độ</h3>
+                    <h3>Lịch Sử Tiến Độ</h3>
                     
                     <c:if test="${not empty progressLogs}">
                         <c:forEach items="${progressLogs}" var="log">

@@ -193,7 +193,7 @@
                 <div class="payment-status ${ticket.paid ? 'payment-paid' : 'payment-unpaid'}">
                     <c:choose>
                         <c:when test="${ticket.paid}">
-                            ✅ ĐÃ THANH TOÁN - Ngày: ${ticket.paymentDate}
+                            ĐÃ THANH TOÁN - Ngày: ${ticket.paymentDate}
                         </c:when>
                         <c:otherwise>
                             ❌ CHƯA THANH TOÁN - Vui lòng thu tiền trước khi bàn giao
@@ -211,7 +211,7 @@
 
         <!-- Delivery Form -->
         <div class="card">
-            <h2>✅ Xác Nhận Bàn Giao</h2>
+            <h2>Xác Nhận Bàn Giao</h2>
             <form action="${pageContext.request.contextPath}/reception/deliver-product" method="post">
                 <input type="hidden" name="ticketId" value="${ticket.ticketId}">
 
@@ -289,7 +289,7 @@
                 <div style="margin-top: 30px;">
                     <button type="submit" class="btn btn-primary" 
                             onclick="return confirm('Xác nhận bàn giao sản phẩm cho khách hàng?')">
-                        ✅ Hoàn Tất Bàn Giao
+                        Hoàn Tất Bàn Giao
                     </button>
                     <a href="${pageContext.request.contextPath}/reception/dashboard" class="btn btn-secondary">
                         ❌ Hủy

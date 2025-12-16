@@ -74,20 +74,28 @@
                     <a href="${pageContext.request.contextPath}/views/admin/dashboard.jsp" class="active">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/admin/import-excel.jsp">
-                        <i class="fas fa-file-excel"></i> Import Excel
+                    <a href="${pageContext.request.contextPath}/admin/import-excel">
+                        <i class="fas fa-file-import"></i> Import Excel
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/admin/customers.jsp">
-                        <i class="fas fa-users"></i> Quản lý khách hàng
+                    
+                    <hr style="border-color: rgba(255,255,255,0.3)">
+                    <small class="text-white-50 px-3">QUẢN LÝ DỮ LIỆU</small>
+                    
+                    <a href="${pageContext.request.contextPath}/admin/customers">
+                        <i class="fas fa-users"></i> Danh sách khách hàng
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/admin/products.jsp">
-                        <i class="fas fa-box"></i> Quản lý sản phẩm
+                    <a href="${pageContext.request.contextPath}/admin/products">
+                        <i class="fas fa-box"></i> Danh sách sản phẩm
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/admin/users.jsp">
-                        <i class="fas fa-user-cog"></i> Quản lý người dùng
+                    <a href="${pageContext.request.contextPath}/admin/users">
+                        <i class="fas fa-user-cog"></i> Danh sách nhân viên
                     </a>
+                    
+                    <hr style="border-color: rgba(255,255,255,0.3)">
+                    <small class="text-white-50 px-3">BÁO CÁO</small>
+                    
                     <a href="${pageContext.request.contextPath}/views/admin/reports.jsp">
-                        <i class="fas fa-chart-bar"></i> Báo cáo
+                        <i class="fas fa-chart-bar"></i> Thống kê & Báo cáo
                     </a>
                     
                     <hr style="border-color: rgba(255,255,255,0.3)">

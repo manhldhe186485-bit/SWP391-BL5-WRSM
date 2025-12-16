@@ -118,7 +118,7 @@
 <body>
     <div class="register-container">
         <div class="logo">
-            <h1>🔧 Hệ Thống Bảo Hành</h1>
+            <h1>Hệ Thống Bảo Hành</h1>
             <p>Đăng ký tài khoản khách hàng</p>
         </div>
 
@@ -177,7 +177,7 @@
                        placeholder="Số điện thoại 10-11 số">
             </div>
 
-            <button type="submit" class="btn btn-primary">✅ Đăng Ký</button>
+            <button type="submit" class="btn btn-primary">Đăng Ký</button>
         </form>
 
         <div class="login-link">
@@ -208,7 +208,7 @@
                 strengthDiv.textContent = '⚠️ Mật khẩu trung bình';
                 strengthDiv.className = 'password-strength strength-medium';
             } else {
-                strengthDiv.textContent = '✅ Mật khẩu mạnh';
+                strengthDiv.textContent = 'Mật khẩu mạnh';
                 strengthDiv.className = 'password-strength strength-strong';
             }
         }

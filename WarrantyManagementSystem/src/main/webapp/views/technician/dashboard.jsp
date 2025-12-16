@@ -101,19 +101,19 @@
                     <a href="${pageContext.request.contextPath}/technician/dashboard" class="active">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-warranty-slip.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/create-diagnosis">
                         <i class="fas fa-file-medical"></i> Tạo phiếu BH
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/request-parts.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/request-parts">
                         <i class="fas fa-toolbox"></i> Yêu cầu linh kiện
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/update-progress">
                         <i class="fas fa-tasks"></i> Cập nhật tiến độ
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-invoice.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/create-invoice">
                         <i class="fas fa-receipt"></i> Tạo phiếu thanh toán
                     </a>
                     
@@ -143,7 +143,7 @@
                         <div class="stat-card blue">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${newAssignedCount != null ? newAssignedCount : 0}</h3>
                                     <small>Đơn được giao</small>
                                 </div>
                                 <i class="fas fa-clipboard-list fa-3x opacity-50"></i>
@@ -154,7 +154,7 @@
                         <div class="stat-card green">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${inProgressCount != null ? inProgressCount : 0}</h3>
                                     <small>Đang sửa chữa</small>
                                 </div>
                                 <i class="fas fa-tools fa-3x opacity-50"></i>
@@ -165,7 +165,7 @@
                         <div class="stat-card orange">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${waitingPartsCount != null ? waitingPartsCount : 0}</h3>
                                     <small>Chờ linh kiện</small>
                                 </div>
                                 <i class="fas fa-pause-circle fa-3x opacity-50"></i>
@@ -176,7 +176,7 @@
                         <div class="stat-card yellow">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${completedCount != null ? completedCount : 0}</h3>
                                     <small>Hoàn thành</small>
                                 </div>
                                 <i class="fas fa-check-circle fa-3x opacity-50"></i>
@@ -209,14 +209,14 @@
                                         </a>
                                     </div>
                                     <div class="col-md-3">
-                                        <a href="${pageContext.request.contextPath}/views/technician/request-parts.jsp" 
+                                        <a href="${pageContext.request.contextPath}/technician/request-parts" 
                                            class="btn btn-lg btn-outline-warning w-100 mb-3">
                                             <i class="fas fa-toolbox fa-2x d-block mb-2"></i>
                                             Yêu cầu linh kiện
                                         </a>
                                     </div>
                                     <div class="col-md-3">
-                                        <a href="${pageContext.request.contextPath}/views/technician/create-invoice.jsp" 
+                                        <a href="${pageContext.request.contextPath}/technician/create-invoice" 
                                            class="btn btn-lg btn-outline-info w-100 mb-3">
                                             <i class="fas fa-receipt fa-2x d-block mb-2"></i>
                                             Tạo phiếu TT
@@ -234,16 +234,73 @@
                         <div class="card shadow-sm">
                             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Đơn được giao cho tôi</h5>
-                                <span class="badge bg-light text-dark">0 đơn</span>
+                                <span class="badge bg-light text-dark">${totalTickets != null ? totalTickets : 0} đơn</span>
                             </div>
                             <div class="card-body">
-                                <div class="text-center text-muted py-5">
-                                    <i class="fas fa-inbox fa-3x mb-3"></i>
-                                    <p>Chưa có đơn nào được giao</p>
-                                    <small class="text-muted">
-                                        Các đơn bảo hành được phân công bởi Tech Manager sẽ hiển thị ở đây
-                                    </small>
-                                </div>
+                                <c:choose>
+                                    <c:when test="${empty myTickets}">
+                                        <div class="text-center text-muted py-5">
+                                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                                            <p>Chưa có đơn nào được giao</p>
+                                            <small class="text-muted">
+                                                Các đơn bảo hành được phân công bởi Tech Manager sẽ hiển thị ở đây
+                                            </small>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mã đơn</th>
+                                                        <th>Khách hàng</th>
+                                                        <th>Sản phẩm</th>
+                                                        <th>Trạng thái</th>
+                                                        <th>Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach items="${myTickets}" var="ticket" varStatus="status">
+                                                        <c:if test="${status.index < 5}">
+                                                            <tr>
+                                                                <td><strong>${ticket.ticketNumber}</strong></td>
+                                                                <td>${ticket.customer.fullName}</td>
+                                                                <td>${ticket.productSerial.serialNumber}</td>
+                                                                <td>
+                                                                    <c:choose>
+                                                                        <c:when test="${ticket.status == 'ASSIGNED'}">
+                                                                            <span class="badge bg-primary">Mới</span>
+                                                                        </c:when>
+                                                                        <c:when test="${ticket.status == 'IN_PROGRESS'}">
+                                                                            <span class="badge bg-warning">Đang sửa</span>
+                                                                        </c:when>
+                                                                        <c:when test="${ticket.status == 'WAITING_PARTS'}">
+                                                                            <span class="badge bg-secondary">Chờ linh kiện</span>
+                                                                        </c:when>
+                                                                        <c:when test="${ticket.status == 'COMPLETED'}">
+                                                                            <span class="badge bg-success">Hoàn thành</span>
+                                                                        </c:when>
+                                                                    </c:choose>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="${pageContext.request.contextPath}/technician/update-progress?ticketId=${ticket.ticketId}" 
+                                                                       class="btn btn-sm btn-primary">
+                                                                        <i class="fas fa-edit"></i> Xử lý
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
+                                            <div class="text-center mt-3">
+                                                <a href="${pageContext.request.contextPath}/technician/my-tickets" class="btn btn-outline-primary">
+                                                    Xem tất cả ${totalTickets} đơn <i class="fas fa-arrow-right"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </div>

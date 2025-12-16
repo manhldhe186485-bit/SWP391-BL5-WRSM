@@ -120,7 +120,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>📥 Tiếp Nhận Sản Phẩm Bảo Hành</h1>
+        <h1>Tiếp Nhận Sản Phẩm Bảo Hành</h1>
     </div>
 
     <div class="container">
@@ -137,18 +137,43 @@
                 
                 <!-- Step 1: Check Serial Number -->
                 <div class="form-group">
-                    <label for="serialNumber">1️⃣ Số Serial Sản Phẩm *</label>
+                    <label for="serialNumber">Số Serial Sản Phẩm *</label>
                     <input type="text" id="serialNumber" name="serialNumber" required 
                            value="${serialNumber}" placeholder="Nhập số serial để kiểm tra">
                     <button type="button" class="btn btn-secondary" id="checkSerialBtn" 
-                            onclick="checkSerial()">🔍 Kiểm Tra Serial</button>
+                            onclick="checkSerial()">Kiểm Tra Serial</button>
                 </div>
 
-                <!-- Serial Info Display -->
+                <!-- Serial Not Found - Customer Info Form -->
+                <div id="customerInfoSection" style="display: none; border: 2px solid #ffc107; padding: 20px; border-radius: 8px; background: #fff3cd; margin-bottom: 20px;">
+                    <h4 style="color: #856404; margin-bottom: 15px;">⚠️ Serial không tồn tại - Nhập thông tin khách hàng</h4>
+                    
+                    <div class="form-group">
+                        <label for="customerName">Tên Khách Hàng *</label>
+                        <input type="text" id="customerName" name="customerName" 
+                               placeholder="Nhập tên khách hàng">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerPhone">Số Điện Thoại *</label>
+                        <input type="tel" id="customerPhone" name="customerPhone" 
+                               placeholder="Nhập số điện thoại khách hàng">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerEmail">Email (tùy chọn)</label>
+                        <input type="email" id="customerEmail" name="customerEmail" 
+                               placeholder="Nhập email khách hàng">
+                    </div>
+                    
+                    <input type="hidden" id="isWalkIn" name="isWalkIn" value="false">
+                </div>
+
+                <!-- Serial Info Display (Found) -->
                 <c:if test="${not empty serialInfo}">
                     <div class="serial-info ${serialInfo.underWarranty ? 'warranty-valid' : 'warranty-expired'}">
                         <p class="warranty-status">
-                            ${serialInfo.underWarranty ? '✅ CÒN BẢO HÀNH' : '❌ HẾT BẢO HÀNH'}
+                            ${serialInfo.underWarranty ? 'CÒN BẢO HÀNH' : 'HẾT BẢO HÀNH'}
                         </p>
                         <p><strong>Sản phẩm:</strong> ${serialInfo.productName}</p>
                         <p><strong>Khách hàng:</strong> ${serialInfo.customerName}</p>
@@ -160,47 +185,40 @@
 
                 <!-- Step 2: Issue Description -->
                 <div class="form-group">
-                    <label for="issueDescription">2️⃣ Mô Tả Lỗi / Vấn Đề *</label>
+                    <label for="issueDescription">Mô Tả Lỗi / Vấn Đề *</label>
                     <textarea id="issueDescription" name="issueDescription" required 
                               placeholder="Mô tả chi tiết vấn đề của sản phẩm...">${issueDescription}</textarea>
                 </div>
 
-                <!-- Step 3: Initial Diagnosis -->
+                <!-- Step 3: Priority -->
                 <div class="form-group">
-                    <label for="initialDiagnosis">3️⃣ Chẩn Đoán Ban Đầu</label>
-                    <textarea id="initialDiagnosis" name="initialDiagnosis" 
-                              placeholder="Ghi chú sơ bộ về tình trạng sản phẩm...">${initialDiagnosis}</textarea>
-                </div>
-
-                <!-- Step 4: Priority -->
-                <div class="form-group">
-                    <label for="priority">4️⃣ Độ Ưu Tiên *</label>
+                    <label for="priority">Độ Ưu Tiên *</label>
                     <select id="priority" name="priority" required>
-                        <option value="low" ${priority == 'low' ? 'selected' : ''}>🟢 Thấp</option>
-                        <option value="medium" ${priority == 'medium' ? 'selected' : ''}>🟡 Trung Bình</option>
-                        <option value="high" ${priority == 'high' ? 'selected' : ''}>🔴 Cao</option>
-                        <option value="urgent" ${priority == 'urgent' ? 'selected' : ''}>🚨 Khẩn Cấp</option>
+                        <option value="LOW" ${priority == 'LOW' ? 'selected' : ''}>Thấp</option>
+                        <option value="MEDIUM" ${priority == 'MEDIUM' ? 'selected' : ''} selected>Trung Bình</option>
+                        <option value="HIGH" ${priority == 'HIGH' ? 'selected' : ''}>Cao</option>
+                        <option value="URGENT" ${priority == 'URGENT' ? 'selected' : ''}>Khẩn Cấp</option>
                     </select>
                 </div>
 
-                <!-- Step 5: Photos -->
+                <!-- Step 4: Photos -->
                 <div class="form-group">
-                    <label for="photos">5️⃣ Ảnh Sản Phẩm (tùy chọn)</label>
-                    <input type="file" id="photos" name="photos" multiple accept="image/*">
-                    <small style="color: #666;">Có thể chọn nhiều ảnh. Hỗ trợ JPG, PNG, GIF</small>
+                    <label for="photo">Ảnh Sản Phẩm (tùy chọn)</label>
+                    <input type="file" id="photo" name="photo" accept="image/*">
+                    <small style="color: #666;">Hỗ trợ JPG, PNG (Max 5MB)</small>
                 </div>
 
-                <!-- Step 6: Notes -->
+                <!-- Step 5: Notes -->
                 <div class="form-group">
-                    <label for="notes">6️⃣ Ghi Chú Thêm</label>
+                    <label for="notes">Ghi Chú Thêm</label>
                     <textarea id="notes" name="notes" 
                               placeholder="Các ghi chú khác...">${notes}</textarea>
                 </div>
 
                 <div style="margin-top: 30px;">
-                    <button type="submit" class="btn btn-primary">✅ Tạo Ticket Bảo Hành</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Tạo Phiếu Bảo Hành</button>
                     <a href="${pageContext.request.contextPath}/tech-manager/dashboard" class="btn btn-secondary">
-                        ❌ Hủy
+                        Hủy
                     </a>
                 </div>
             </form>
@@ -214,7 +232,51 @@
                 alert('Vui lòng nhập số serial!');
                 return;
             }
-            window.location.href = '${pageContext.request.contextPath}/tech-manager/receive-product?action=check&serialNumber=' + encodeURIComponent(serialNumber);
+            
+            // Call AJAX to check serial
+            fetch('${pageContext.request.contextPath}/tech-manager/check-serial?serialNumber=' + encodeURIComponent(serialNumber))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.found) {
+                        // Serial tồn tại - hiển thị thông tin
+                        alert('✅ Tìm thấy sản phẩm!\nKhách hàng: ' + data.customerName + 
+                              '\nTrạng thái: ' + (data.underWarranty ? 'Còn bảo hành' : 'Hết bảo hành'));
+                        
+                        // Ẩn form customer info
+                        document.getElementById('customerInfoSection').style.display = 'none';
+                        document.getElementById('isWalkIn').value = 'false';
+                        
+                        // Đổi button về bảo hành
+                        const submitBtn = document.getElementById('submitBtn');
+                        submitBtn.textContent = 'Tạo Phiếu Bảo Hành';
+                        submitBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                        
+                        // Không bắt buộc customer info
+                        document.getElementById('customerName').removeAttribute('required');
+                        document.getElementById('customerPhone').removeAttribute('required');
+                        
+                    } else {
+                        // Serial không tồn tại - hiển thị form nhập customer
+                        alert('⚠️ Không tìm thấy serial trong hệ thống!\nVui lòng nhập thông tin khách hàng để tạo phiếu sửa chữa.');
+                        
+                        // Hiển thị form customer info
+                        document.getElementById('customerInfoSection').style.display = 'block';
+                        document.getElementById('isWalkIn').value = 'true';
+                        
+                        // Đổi button thành sửa chữa
+                        const submitBtn = document.getElementById('submitBtn');
+                        submitBtn.textContent = 'Tạo Phiếu Sửa Chữa';
+                        submitBtn.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+                        
+                        // Bắt buộc nhập customer info
+                        document.getElementById('customerName').setAttribute('required', 'required');
+                        document.getElementById('customerPhone').setAttribute('required', 'required');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi kiểm tra serial!');
+                });
         }
     </script>
 </body>

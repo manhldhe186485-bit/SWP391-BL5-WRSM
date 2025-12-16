@@ -125,7 +125,7 @@
                 <div class="number">${readyToDeliverCount}</div>
             </div>
             <div class="stat-card">
-                <h3>✅ Đã Giao Hôm Nay</h3>
+                <h3>Đã Giao Hôm Nay</h3>
                 <div class="number">${deliveredTodayCount}</div>
             </div>
             <div class="stat-card">
@@ -133,7 +133,7 @@
                 <div class="number">${unpaidCount}</div>
             </div>
             <div class="stat-card">
-                <h3>📊 Tổng Giao Tháng Này</h3>
+                <h3>Tổng Giao Tháng Này</h3>
                 <div class="number">${deliveredThisMonth}</div>
             </div>
         </div>
@@ -170,7 +170,7 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${ticket.paid}">
-                                            <span style="color: #28a745;">✅ Đã TT</span>
+                                            <span style="color: #28a745;">Đã TT</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span style="color: #dc3545;">❌ Chưa TT</span>

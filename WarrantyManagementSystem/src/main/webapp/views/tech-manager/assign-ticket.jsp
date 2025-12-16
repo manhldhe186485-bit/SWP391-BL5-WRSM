@@ -125,7 +125,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>👥 Phân Công Kỹ Thuật Viên</h1>
+        <h1>Phân Công Kỹ Thuật Viên</h1>
     </div>
 
     <div class="container">
@@ -138,11 +138,11 @@
 
         <!-- Pending Tickets -->
         <div class="card">
-            <h2>🎫 Tickets Chờ Phân Công (${pendingTickets.size()})</h2>
+            <h2>Tickets Chờ Phân Công <c:if test="${not empty pendingTickets}">(${pendingTickets.size()})</c:if></h2>
             
             <c:if test="${empty pendingTickets}">
                 <div class="empty-state">
-                    <h3>✅ Tất Cả Tickets Đã Được Phân Công</h3>
+                    <h3>Tất Cả Tickets Đã Được Phân Công</h3>
                     <p>Không có ticket nào đang chờ phân công</p>
                 </div>
             </c:if>
@@ -165,9 +165,9 @@
                         <tbody>
                             <c:forEach items="${pendingTickets}" var="ticket">
                                 <tr>
-                                    <td><strong>${ticket.ticketCode}</strong></td>
-                                    <td>${ticket.productSerialNumber}</td>
-                                    <td>${ticket.customerName}</td>
+                                    <td><strong>${ticket.ticketNumber}</strong></td>
+                                    <td>${ticket.productSerial.serialNumber}</td>
+                                    <td>${ticket.customer.fullName}</td>
                                     <td style="max-width: 200px;">
                                         ${ticket.issueDescription.length() > 50 ? 
                                           ticket.issueDescription.substring(0, 50) + '...' : 
@@ -181,8 +181,8 @@
                                             <c:forEach items="${technicians}" var="tech">
                                                 <option value="${tech.userId}">
                                                     ${tech.fullName} 
-                                                    <c:if test="${not empty tech.currentWorkload}">
-                                                        (${tech.currentWorkload} tickets)
+                                                    <c:if test="${not empty technicianWorkload[tech.userId]}">
+                                                        (${technicianWorkload[tech.userId]} tickets)
                                                     </c:if>
                                                 </option>
                                             </c:forEach>
@@ -191,7 +191,7 @@
                                     <td>
                                         <button type="submit" name="ticketId" value="${ticket.ticketId}" 
                                                 class="btn btn-primary">
-                                            ✅ Phân Công
+                                            Phân Công
                                         </button>
                                     </td>
                                 </tr>
@@ -204,7 +204,7 @@
 
         <!-- Technicians Workload -->
         <div class="card">
-            <h2>👨‍🔧 Tình Trạng Kỹ Thuật Viên</h2>
+            <h2>Tình Trạng Kỹ Thuật Viên</h2>
             <table>
                 <thead>
                     <tr>
@@ -223,19 +223,19 @@
                             <td>${tech.phone}</td>
                             <td>
                                 <span class="workload-badge">
-                                    ${tech.currentWorkload != null ? tech.currentWorkload : 0} tickets
+                                    ${technicianWorkload[tech.userId] != null ? technicianWorkload[tech.userId] : 0} tickets
                                 </span>
                             </td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${tech.currentWorkload == 0}">
-                                        <span style="color: #28a745;">🟢 Rảnh</span>
+                                    <c:when test="${technicianWorkload[tech.userId] == 0}">
+                                        <span style="color: #28a745;">Rảnh</span>
                                     </c:when>
-                                    <c:when test="${tech.currentWorkload < 5}">
-                                        <span style="color: #ffc107;">🟡 Bình Thường</span>
+                                    <c:when test="${technicianWorkload[tech.userId] < 5}">
+                                        <span style="color: #ffc107;">Bình Thường</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <span style="color: #dc3545;">🔴 Bận</span>
+                                        <span style="color: #dc3545;">Bận</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>

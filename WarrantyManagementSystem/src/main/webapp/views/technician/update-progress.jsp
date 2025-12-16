@@ -99,7 +99,7 @@
                     <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp" class="active">
                         <i class="fas fa-tasks"></i> Cập nhật tiến độ
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-invoice.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/create-invoice">
                         <i class="fas fa-receipt"></i> Tạo phiếu thanh toán
                     </a>
                     

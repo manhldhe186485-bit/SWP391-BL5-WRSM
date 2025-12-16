@@ -166,57 +166,63 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <h1>📊 Quản Lý Kỹ Thuật - Dashboard</h1>
+            <h1>Quản Lý Kỹ Thuật - Dashboard</h1>
             <div class="user-info">
-                <span>👤 ${sessionScope.user.fullName} (${sessionScope.user.role})</span>
+                <span>${sessionScope.fullName} (${sessionScope.role})</span>
                 <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Đăng Xuất</a>
             </div>
         </div>
     </div>
 
     <div class="container">
+        <c:if test="${not empty message}">
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                ${message}
+            </div>
+        </c:if>
+        
         <!-- Statistics -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>📥 Yêu Cầu Chờ Tiếp Nhận</h3>
-                <div class="number">${pendingCount}</div>
+                <h3>Yêu Cầu Chờ Tiếp Nhận</h3>
+                <div class="number">${pendingCount != null ? pendingCount : 0}</div>
             </div>
             <div class="stat-card">
-                <h3>⚙️ Đang Chờ Phân Công</h3>
-                <div class="number">${waitingAssignCount}</div>
+                <h3>Đang Chờ Phân Công</h3>
+                <div class="number">${waitingAssignCount != null ? waitingAssignCount : 0}</div>
             </div>
             <div class="stat-card">
-                <h3>🔧 Đang Sửa Chữa</h3>
-                <div class="number">${inProgressCount}</div>
+                <h3>Đang Sửa Chữa</h3>
+                <div class="number">${inProgressCount != null ? inProgressCount : 0}</div>
             </div>
             <div class="stat-card">
-                <h3>✅ Hoàn Thành Tháng Này</h3>
-                <div class="number">${completedThisMonth}</div>
+                <h3>Hoàn Thành Tháng Này</h3>
+                <div class="number">${completedThisMonth != null ? completedThisMonth : 0}</div>
             </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="actions">
-            <h2>🚀 Thao Tác Nhanh</h2>
+            <h2>Thao Tác Nhanh</h2>
             <div class="action-buttons">
                 <a href="${pageContext.request.contextPath}/tech-manager/receive-product" class="btn btn-primary">
-                    📥 Tiếp Nhận Sản Phẩm BH
+                    Tiếp Nhận Sản Phẩm BH
                 </a>
                 <a href="${pageContext.request.contextPath}/tech-manager/assign-ticket" class="btn btn-primary">
-                    👥 Phân Công Kỹ Thuật Viên
+                    Phân Công Kỹ Thuật Viên
                 </a>
                 <a href="${pageContext.request.contextPath}/tech-manager/tickets" class="btn btn-secondary">
-                    📋 Xem Tất Cả Tickets
+                    Xem Tất Cả Tickets
                 </a>
                 <a href="${pageContext.request.contextPath}/tech-manager/reports" class="btn btn-secondary">
-                    📊 Báo Cáo & Thống Kê
+                    Báo Cáo & Thống Kê
                 </a>
             </div>
         </div>
 
         <!-- Recent Tickets -->
         <div class="recent-tickets">
-            <h2>🎫 Tickets Gần Đây</h2>
+            <h2>Tickets Gần Đây</h2>
             <c:if test="${empty recentTickets}">
                 <p style="text-align: center; color: #999; padding: 40px;">Chưa có ticket nào</p>
             </c:if>

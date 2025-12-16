@@ -152,7 +152,7 @@
                     <input type="text" name="location" value="${item.location}" 
                            placeholder="VD: Kệ A1, Ngăn B2...">
                 </div>
-                <button type="submit" class="btn btn-primary">✅ ${editMode ? 'Cập Nhật' : 'Tạo'}</button>
+                <button type="submit" class="btn btn-primary">${editMode ? 'Cập Nhật' : 'Tạo'}</button>
                 <button type="button" class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/warehouse/inventory?action=list'">❌ Hủy</button>
             </form>
         </div>
@@ -173,7 +173,7 @@
                     <label>Số Lượng Nhập *</label>
                     <input type="number" name="quantity" min="1" required placeholder="Nhập số lượng">
                 </div>
-                <button type="submit" class="btn btn-success">✅ Xác Nhận Nhập</button>
+                <button type="submit" class="btn btn-success">Xác Nhận Nhập</button>
                 <button type="button" class="btn btn-secondary" onclick="hideModal('importModal')">❌ Hủy</button>
             </form>
         </div>

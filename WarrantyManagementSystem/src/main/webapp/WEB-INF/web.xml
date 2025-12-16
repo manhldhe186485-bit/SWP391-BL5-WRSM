@@ -59,25 +59,7 @@
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>RegisterServlet</servlet-name>
-        <servlet-class>com.warranty.servlet.RegisterServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>RegisterServlet</servlet-name>
-        <url-pattern>/register</url-pattern>
-    </servlet-mapping>
-
     <!-- Admin Servlets -->
-    <servlet>
-        <servlet-name>ImportExcelServlet</servlet-name>
-        <servlet-class>com.warranty.servlet.ImportExcelServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ImportExcelServlet</servlet-name>
-        <url-pattern>/admin/import-excel</url-pattern>
-    </servlet-mapping>
-
     <servlet>
         <servlet-name>ProductCustomerListServlet</servlet-name>
         <servlet-class>com.warranty.servlet.ProductCustomerListServlet</servlet-class>
@@ -98,14 +80,6 @@
     </servlet-mapping>
 
     <!-- Technical Manager Servlets -->
-    <servlet>
-        <servlet-name>AssignTicketServlet</servlet-name>
-        <servlet-class>com.warranty.servlet.AssignTicketServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AssignTicketServlet</servlet-name>
-        <url-pattern>/tech-manager/assign-ticket</url-pattern>
-    </servlet-mapping>
 
     <!-- Warehouse Servlets -->
     <servlet>
@@ -125,6 +99,36 @@
     <servlet-mapping>
         <servlet-name>CustomerPortalServlet</servlet-name>
         <url-pattern>/customer/track-ticket</url-pattern>
+    </servlet-mapping>
+
+    <!-- Import Excel Servlet -->
+    <servlet>
+        <servlet-name>ImportExcelServlet</servlet-name>
+        <servlet-class>com.warranty.servlet.ImportExcelServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ImportExcelServlet</servlet-name>
+        <url-pattern>/admin/import-excel</url-pattern>
+    </servlet-mapping>
+
+    <!-- Customer Management Servlet -->
+    <servlet>
+        <servlet-name>CustomerManagementServlet</servlet-name>
+        <servlet-class>com.warranty.servlet.CustomerManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CustomerManagementServlet</servlet-name>
+        <url-pattern>/admin/customers</url-pattern>
+    </servlet-mapping>
+
+    <!-- Test Import Servlet -->
+    <servlet>
+        <servlet-name>TestImportServlet</servlet-name>
+        <servlet-class>com.warranty.servlet.TestImportServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TestImportServlet</servlet-name>
+        <url-pattern>/admin/test-import</url-pattern>
     </servlet-mapping>
 
     <!-- Error Pages -->
