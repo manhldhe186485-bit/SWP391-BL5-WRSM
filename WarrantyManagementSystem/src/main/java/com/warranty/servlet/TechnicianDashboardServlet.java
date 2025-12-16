@@ -33,13 +33,28 @@ public class TechnicianDashboardServlet extends HttpServlet {
         // Get technician ID from session
         Integer technicianId = (Integer) request.getSession().getAttribute("userId");
         
+        // DEBUG: Print to console
+        System.out.println("=== TECHNICIAN DASHBOARD DEBUG ===");
+        System.out.println("Technician ID from session: " + technicianId);
+        System.out.println("Username from session: " + request.getSession().getAttribute("username"));
+        
         // ========== GỌI SERVICE ĐỂ LẤY DỮ LIỆU ==========
         
-        // Get tickets assigned to this technician
+        // Get tickets assigned to this technician (includes related objects)
         List<RepairTicket> myTickets = repairTicketService.getTicketsByTechnician(technicianId);
         
-        // Count tickets by status
+        // DEBUG: Print tickets
+        System.out.println("Total tickets found: " + myTickets.size());
+        for (RepairTicket t : myTickets) {
+            System.out.println("  - Ticket: " + t.getTicketNumber() + " | Status: " + t.getStatus() + " | Assigned to: " + t.getAssignedTechnicianId());
+        }
+        System.out.println("=================================");
+        
+        // Count tickets by status (bao gồm cả ASSIGNED - mới được giao)
         long totalTickets = myTickets.size();
+        long newAssignedCount = myTickets.stream()
+                .filter(t -> t.getStatus() == RepairTicket.TicketStatus.ASSIGNED)
+                .count();
         long inProgressCount = myTickets.stream()
                 .filter(t -> t.getStatus() == RepairTicket.TicketStatus.IN_PROGRESS)
                 .count();
@@ -53,6 +68,7 @@ public class TechnicianDashboardServlet extends HttpServlet {
         // Set attributes for JSP
         request.setAttribute("myTickets", myTickets);
         request.setAttribute("totalTickets", totalTickets);
+        request.setAttribute("newAssignedCount", newAssignedCount);
         request.setAttribute("inProgressCount", inProgressCount);
         request.setAttribute("waitingPartsCount", waitingPartsCount);
         request.setAttribute("completedCount", completedCount);

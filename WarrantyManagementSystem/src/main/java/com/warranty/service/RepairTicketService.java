@@ -64,8 +64,8 @@ public class RepairTicketService {
         }
 
         // Check if ticket is in assignable status
-        if (ticket.getStatus() != RepairTicket.TicketStatus.PENDING) {
-            throw new IllegalStateException("Ticket is not in PENDING status");
+        if (ticket.getStatus() != RepairTicket.TicketStatus.PENDING_ASSIGNMENT) {
+            throw new IllegalStateException("Ticket is not in PENDING_ASSIGNMENT status");
         }
 
         // Assign ticket
@@ -109,7 +109,9 @@ public class RepairTicketService {
      * @return List of tickets
      */
     public List<RepairTicket> getTicketsByTechnician(int technicianId) {
-        return repairTicketDAO.getTicketsByTechnician(technicianId);
+        List<RepairTicket> tickets = repairTicketDAO.getTicketsByTechnician(technicianId);
+        repairTicketDAO.loadRelatedObjects(tickets); // Load ProductSerial & Customer
+        return tickets;
     }
 
     /**
@@ -118,14 +120,20 @@ public class RepairTicketService {
      * @return List of tickets
      */
     public List<RepairTicket> getTicketsByStatus(RepairTicket.TicketStatus status) {
-        return repairTicketDAO.getTicketsByStatus(status);
+        List<RepairTicket> tickets = repairTicketDAO.getTicketsByStatus(status);
+        repairTicketDAO.loadRelatedObjects(tickets); // Load ProductSerial & Customer
+        return tickets;
     }
 
     /**
      * Get ticket by ID
      */
     public RepairTicket getTicketById(int ticketId) {
-        return repairTicketDAO.getTicketById(ticketId);
+        RepairTicket ticket = repairTicketDAO.getTicketById(ticketId);
+        if (ticket != null) {
+            repairTicketDAO.loadRelatedObjects(ticket); // Load related objects
+        }
+        return ticket;
     }
 
     /**
