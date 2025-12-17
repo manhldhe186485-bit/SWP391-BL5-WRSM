@@ -22,9 +22,9 @@ import java.time.LocalDate;
 
 /**
  * Servlet for receiving warranty requests from customers
- * Tech Manager/Reception staff use this
+ * Technician staff use this
  */
-@WebServlet("/tech-manager/receive-product")
+@WebServlet("/technician/receive-product")
 @MultipartConfig(maxFileSize = 5 * 1024 * 1024) // 5MB for photos
 public class ReceiveProductServlet extends HttpServlet {
 

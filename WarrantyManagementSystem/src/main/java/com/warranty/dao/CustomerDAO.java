@@ -9,7 +9,7 @@ import java.util.List;
 
 public class CustomerDAO {
 
-    public List<Customer> getAllCustomers() throws SQLException {
+    public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT * FROM customers ORDER BY created_at DESC";
         
@@ -28,12 +28,14 @@ public class CustomerDAO {
                 
                 customers.add(customer);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         
         return customers;
     }
 
-    public Customer getCustomerById(int customerId) throws SQLException {
+    public Customer getCustomerById(int customerId) {
         String sql = "SELECT * FROM customers WHERE customer_id = ?";
         
         try (Connection conn = DatabaseUtil.getConnection();
@@ -52,12 +54,14 @@ public class CustomerDAO {
                 customer.setCreatedAt(rs.getTimestamp("created_at"));
                 return customer;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         
         return null;
     }
 
-    public boolean insertCustomer(Customer customer) throws SQLException {
+    public boolean insertCustomer(Customer customer) {
         String sql = "INSERT INTO customers (full_name, email, phone, address) VALUES (?, ?, ?, ?)";
         
         try (Connection conn = DatabaseUtil.getConnection();
@@ -79,6 +83,55 @@ public class CustomerDAO {
                 }
                 return true;
             }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Create new customer (alias for insertCustomer for consistency)
+     */
+    public boolean createCustomer(Customer customer) {
+        return insertCustomer(customer);
+    }
+    
+    /**
+     * Update existing customer
+     */
+    public boolean updateCustomer(Customer customer) {
+        String sql = "UPDATE customers SET full_name = ?, email = ?, phone = ?, address = ? WHERE customer_id = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, customer.getFullName());
+            stmt.setString(2, customer.getEmail());
+            stmt.setString(3, customer.getPhone());
+            stmt.setString(4, customer.getAddress());
+            stmt.setInt(5, customer.getCustomerId());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete customer by ID
+     */
+    public boolean deleteCustomer(int customerId) {
+        String sql = "DELETE FROM customers WHERE customer_id = ?";
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, customerId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }

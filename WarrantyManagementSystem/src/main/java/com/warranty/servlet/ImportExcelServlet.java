@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -73,28 +75,34 @@ public class ImportExcelServlet extends HttpServlet {
         response.getWriter().println("</div>");
         
         // Select data type
-        response.getWriter().println("<div class='mb-4'>");
-        response.getWriter().println("<label class='form-label'><strong>Loại dữ liệu import:</strong></label>");
-        response.getWriter().println("<div class='row'>");
-        response.getWriter().println("<div class='col-md-4'>");
-        response.getWriter().println("<div class='form-check'>");
-        response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='customers' value='customers' checked>");
-        response.getWriter().println("<label class='form-check-label' for='customers'>");
-        response.getWriter().println("<i class='fas fa-users text-primary me-2'></i>Khách hàng");
-        response.getWriter().println("</label></div></div>");
-        response.getWriter().println("<div class='col-md-4'>");
-        response.getWriter().println("<div class='form-check'>");
-        response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='products' value='products'>");
-        response.getWriter().println("<label class='form-check-label' for='products'>");
-        response.getWriter().println("<i class='fas fa-box text-success me-2'></i>Sản phẩm");
-        response.getWriter().println("</label></div></div>");
-        response.getWriter().println("<div class='col-md-4'>");
-        response.getWriter().println("<div class='form-check'>");
-        response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='employees' value='employees'>");
-        response.getWriter().println("<label class='form-check-label' for='employees'>");
-        response.getWriter().println("<i class='fas fa-user-tie text-warning me-2'></i>Nhân viên");
-        response.getWriter().println("</label></div></div>");
-        response.getWriter().println("</div></div>");
+    response.getWriter().println("<div class='mb-4'>");
+    response.getWriter().println("<label class='form-label'><strong>Loại dữ liệu import:</strong></label>");
+    response.getWriter().println("<div class='row'>");
+    response.getWriter().println("<div class='col-md-3'>");
+    response.getWriter().println("<div class='form-check'>");
+    response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='customers' value='customers' checked>");
+    response.getWriter().println("<label class='form-check-label' for='customers'>");
+    response.getWriter().println("<i class='fas fa-users text-primary me-2'></i>Khách hàng");
+    response.getWriter().println("</label></div></div>");
+    response.getWriter().println("<div class='col-md-3'>");
+    response.getWriter().println("<div class='form-check'>");
+    response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='products' value='products'>");
+    response.getWriter().println("<label class='form-check-label' for='products'>");
+    response.getWriter().println("<i class='fas fa-box text-success me-2'></i>Sản phẩm");
+    response.getWriter().println("</label></div></div>");
+    response.getWriter().println("<div class='col-md-3'>");
+    response.getWriter().println("<div class='form-check'>");
+    response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='customer_products' value='customer_products'>");
+    response.getWriter().println("<label class='form-check-label' for='customer_products'>");
+    response.getWriter().println("<i class='fas fa-users-cog text-info me-2'></i>Khách hàng + Sản phẩm");
+    response.getWriter().println("</label></div></div>");
+    response.getWriter().println("<div class='col-md-3'>");
+    response.getWriter().println("<div class='form-check'>");
+    response.getWriter().println("<input class='form-check-input' type='radio' name='dataType' id='employees' value='employees'>");
+    response.getWriter().println("<label class='form-check-label' for='employees'>");
+    response.getWriter().println("<i class='fas fa-user-tie text-warning me-2'></i>Nhân viên");
+    response.getWriter().println("</label></div></div>");
+    response.getWriter().println("</div></div>");
         
         response.getWriter().println("<div class='text-center'>");
         response.getWriter().println("<button type='submit' class='btn btn-gradient btn-lg'>");
@@ -106,16 +114,17 @@ public class ImportExcelServlet extends HttpServlet {
         // Instructions
         response.getWriter().println("<div class='card info-card mt-4'>");
         response.getWriter().println("<div class='card-body'>");
-        response.getWriter().println("<h6><i class='fas fa-info-circle me-2'></i>Hướng dẫn định dạng Excel:</h6>");
-        response.getWriter().println("<ul class='mb-0'>");
-        response.getWriter().println("<li><strong>Khách hàng:</strong> Họ tên | Email | SĐT | Địa chỉ</li>");
-        response.getWriter().println("<li><strong>Sản phẩm:</strong> Mã SP | Tên SP | Giá | Mô tả | Serial Number</li>");
-        response.getWriter().println("<li><strong>Nhân viên:</strong> Họ tên | Username | Email | SĐT | Chức vụ</li>");
-        response.getWriter().println("</ul>");
+    response.getWriter().println("<h6><i class='fas fa-info-circle me-2'></i>Hướng dẫn định dạng Excel:</h6>");
+    response.getWriter().println("<ul class='mb-0'>");
+    response.getWriter().println("<li><strong>Khách hàng:</strong> Họ tên | Email | SĐT | Địa chỉ</li>");
+    response.getWriter().println("<li><strong>Sản phẩm:</strong> Mã SP | Tên SP | Giá | Mô tả | Serial Number</li>");
+    response.getWriter().println("<li><strong>Khách hàng + Sản phẩm (gộp):</strong> Họ tên | Email | SĐT | Địa chỉ | Mã SP | Tên SP | Giá | Mô tả | Serial Number</li>");
+    response.getWriter().println("<li><strong>Nhân viên:</strong> Họ tên | Username | Email | SĐT | Chức vụ</li>");
+    response.getWriter().println("</ul>");
         response.getWriter().println("</div></div>");
         
         response.getWriter().println("<div class='text-center mt-4'>");
-        response.getWriter().println("<a href='/admin/dashboard' class='btn btn-outline-secondary'>");
+        response.getWriter().println("<a href='" + request.getContextPath() + "/admin/dashboard' class='btn btn-outline-secondary'>");
         response.getWriter().println("<i class='fas fa-arrow-left me-2'></i>Quay lại Dashboard");
         response.getWriter().println("</a>");
         response.getWriter().println("</div>");
@@ -169,6 +178,9 @@ public class ImportExcelServlet extends HttpServlet {
             } else if ("products".equals(dataType)) {
                 processedRows = processProducts(sheet);
                 resultMessage = "Import " + processedRows + " sản phẩm thành công!";
+            } else if ("customer_products".equals(dataType)) {
+                processedRows = processCustomerProducts(sheet);
+                resultMessage = "Import " + processedRows + " hàng (khách + sản phẩm) thành công!";
             } else if ("employees".equals(dataType)) {
                 processedRows = processEmployees(sheet);
                 resultMessage = "Import " + processedRows + " nhân viên thành công!";
@@ -210,10 +222,10 @@ public class ImportExcelServlet extends HttpServlet {
         
         response.getWriter().println("<p class='lead'>" + resultMessage + "</p>");
         response.getWriter().println("<div class='mt-4'>");
-        response.getWriter().println("<a href='/admin/import-excel' class='btn btn-primary me-3'>");
+        response.getWriter().println("<a href='" + request.getContextPath() + "/admin/import-excel' class='btn btn-primary me-3'>");
         response.getWriter().println("<i class='fas fa-upload me-2'></i>Import thêm file");
         response.getWriter().println("</a>");
-        response.getWriter().println("<a href='/admin/dashboard' class='btn btn-outline-secondary'>");
+        response.getWriter().println("<a href='" + request.getContextPath() + "/admin/dashboard' class='btn btn-outline-secondary'>");
         response.getWriter().println("<i class='fas fa-home me-2'></i>Dashboard");
         response.getWriter().println("</a>");
         response.getWriter().println("</div>");
@@ -234,7 +246,7 @@ public class ImportExcelServlet extends HttpServlet {
     
     private int processCustomers(Sheet sheet) throws SQLException {
         int count = 0;
-        String sql = "INSERT INTO customers (full_name, email, phone_number, address, created_date) VALUES (?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO customers (full_name, email, phone, address, created_at) VALUES (?, ?, ?, ?, NOW())";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -270,8 +282,8 @@ public class ImportExcelServlet extends HttpServlet {
     
     private int processProducts(Sheet sheet) throws SQLException {
         int count = 0;
-        String productSql = "INSERT INTO products (product_code, product_name, price, description, created_date) VALUES (?, ?, ?, ?, NOW())";
-        String serialSql = "INSERT INTO product_serials (product_id, serial_number, status, created_date) VALUES (LAST_INSERT_ID(), ?, 'AVAILABLE', NOW())";
+        String productSql = "INSERT INTO products (product_code, product_name, description, created_at) VALUES (?, ?, ?, NOW())";
+        String serialSql = "INSERT INTO product_serials (product_id, serial_number, status, created_at) VALUES (LAST_INSERT_ID(), ?, 'ACTIVE', NOW())";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement productStmt = conn.prepareStatement(productSql);
@@ -290,15 +302,10 @@ public class ImportExcelServlet extends HttpServlet {
                     String serialNumber = getCellValue(row.getCell(4));
                     
                     if (productCode != null && !productCode.trim().isEmpty()) {
-                        // Insert product
+                        // Insert product (bỏ price vì bảng products không có cột này)
                         productStmt.setString(1, productCode.trim());
                         productStmt.setString(2, productName != null ? productName.trim() : "");
-                        try {
-                            productStmt.setBigDecimal(3, new java.math.BigDecimal(price != null ? price.trim() : "0"));
-                        } catch (NumberFormatException e) {
-                            productStmt.setBigDecimal(3, java.math.BigDecimal.ZERO);
-                        }
-                        productStmt.setString(4, description != null ? description.trim() : "");
+                        productStmt.setString(3, description != null ? description.trim() : "");
                         
                         productStmt.executeUpdate();
                         
@@ -320,9 +327,11 @@ public class ImportExcelServlet extends HttpServlet {
     
     private int processEmployees(Sheet sheet) throws SQLException {
         int count = 0;
-        String sql = "INSERT INTO users (username, full_name, email, phone_number, role, password_hash, status, created_date) VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE', NOW())";
+        String checkSql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
+        String sql = "INSERT INTO users (username, full_name, email, phone, role, password_hash, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, TRUE, NOW())";
         
         try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement checkStmt = conn.prepareStatement(checkSql);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             // Format: Họ tên | Username | Email | SĐT | Chức vụ
@@ -337,27 +346,190 @@ public class ImportExcelServlet extends HttpServlet {
                     String phone = getCellValue(row.getCell(3));
                     String role = getCellValue(row.getCell(4));
                     
-                    if (username != null && !username.trim().isEmpty()) {
-                        stmt.setString(1, username.trim());
-                        stmt.setString(2, fullName != null ? fullName.trim() : "");
-                        stmt.setString(3, email != null ? email.trim() : "");
-                        stmt.setString(4, phone != null ? phone.trim() : "");
-                        
-                        // Map role string to enum
-                        String mappedRole = mapRole(role);
-                        stmt.setString(5, mappedRole);
-                        
-                        // Default password (should be changed on first login)
-                        stmt.setString(6, "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFGjO64ofblaQysjbA2Ho9y"); // password: "123456"
-                        
-                        stmt.executeUpdate();
-                        count++;
+                    // Validate required fields
+                    if (username == null || username.trim().isEmpty()) {
+                        System.err.println("Lỗi row " + (i+1) + ": Username không được rỗng");
+                        continue;
                     }
+                    if (email == null || email.trim().isEmpty()) {
+                        System.err.println("Lỗi row " + (i+1) + ": Email không được rỗng");
+                        continue;
+                    }
+                    
+                    // Check if username or email already exists
+                    checkStmt.setString(1, username.trim());
+                    checkStmt.setString(2, email.trim());
+                    try (ResultSet rs = checkStmt.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            System.err.println("Lỗi row " + (i+1) + ": Username hoặc Email đã tồn tại");
+                            continue;
+                        }
+                    }
+                    
+                    // Insert new user
+                    stmt.setString(1, username.trim());
+                    stmt.setString(2, fullName != null ? fullName.trim() : "");
+                    stmt.setString(3, email.trim());
+                    stmt.setString(4, phone != null ? phone.trim() : null);
+                    
+                    // Map role string to enum
+                    String mappedRole = mapRole(role);
+                    stmt.setString(5, mappedRole);
+                    
+                    // Default password (should be changed on first login)
+                    stmt.setString(6, "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFGjO64ofblaQysjbA2Ho9y"); // password: "123456"
+                    
+                    stmt.executeUpdate();
+                    count++;
                 } catch (Exception e) {
                     System.err.println("Lỗi xử lý employee row " + (i+1) + ": " + e.getMessage());
                 }
             }
         }
+        return count;
+    }
+    
+    /**
+     * Process combined rows where each row contains customer + product info.
+     * Expected format (columns):
+     * FullName | Email | Phone | Address | ProductCode | ProductName | Price | Description | SerialNumber
+     */
+    private int processCustomerProducts(Sheet sheet) throws SQLException {
+        int count = 0;
+
+        String selectCustomerSql = "SELECT customer_id FROM customers WHERE email = ? OR phone = ? LIMIT 1";
+        String insertCustomerSql = "INSERT INTO customers (full_name, email, phone, address, created_at) VALUES (?, ?, ?, ?, NOW())";
+
+        String selectProductSql = "SELECT product_id, warranty_period_months FROM products WHERE product_code = ? LIMIT 1";
+        String insertProductSql = "INSERT INTO products (product_code, product_name, description, created_at) VALUES (?, ?, ?, NOW())";
+
+        String selectSerialSql = "SELECT serial_id FROM product_serials WHERE serial_number = ? LIMIT 1";
+        String insertSerialSql = "INSERT INTO product_serials (product_id, serial_number, customer_id, purchase_date, warranty_start_date, warranty_end_date, purchase_price, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIVE', NOW())";
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement selectCustomerStmt = conn.prepareStatement(selectCustomerSql);
+             PreparedStatement insertCustomerStmt = conn.prepareStatement(insertCustomerSql, PreparedStatement.RETURN_GENERATED_KEYS);
+             PreparedStatement selectProductStmt = conn.prepareStatement(selectProductSql);
+             PreparedStatement insertProductStmt = conn.prepareStatement(insertProductSql, PreparedStatement.RETURN_GENERATED_KEYS);
+             PreparedStatement selectSerialStmt = conn.prepareStatement(selectSerialSql);
+             PreparedStatement insertSerialStmt = conn.prepareStatement(insertSerialSql)) {
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                try {
+                    String fullName = getCellValue(row.getCell(0));
+                    String email = getCellValue(row.getCell(1));
+                    String phone = getCellValue(row.getCell(2));
+                    String address = getCellValue(row.getCell(3));
+
+                    String productCode = getCellValue(row.getCell(4));
+                    String productName = getCellValue(row.getCell(5));
+                    String priceStr = getCellValue(row.getCell(6));
+                    String description = getCellValue(row.getCell(7));
+                    String serialNumber = getCellValue(row.getCell(8));
+
+                    if ((fullName == null || fullName.trim().isEmpty()) &&
+                        (productCode == null || productCode.trim().isEmpty())) {
+                        continue; // nothing to do
+                    }
+
+                    // --- Ensure customer exists or create ---
+                    Integer customerId = null;
+                    selectCustomerStmt.setString(1, email != null ? email.trim() : "");
+                    selectCustomerStmt.setString(2, phone != null ? phone.trim() : "");
+                    try (ResultSet rs = selectCustomerStmt.executeQuery()) {
+                        if (rs.next()) {
+                            customerId = rs.getInt("customer_id");
+                        }
+                    }
+
+                    if (customerId == null && (fullName != null && !fullName.trim().isEmpty())) {
+                        insertCustomerStmt.setString(1, fullName.trim());
+                        insertCustomerStmt.setString(2, email != null ? email.trim() : "");
+                        insertCustomerStmt.setString(3, phone != null ? phone.trim() : "");
+                        insertCustomerStmt.setString(4, address != null ? address.trim() : "");
+                        insertCustomerStmt.executeUpdate();
+                        try (ResultSet keys = insertCustomerStmt.getGeneratedKeys()) {
+                            if (keys.next()) {
+                                customerId = keys.getInt(1);
+                            }
+                        }
+                    }
+
+                    // --- Ensure product exists or create ---
+                    Integer productId = null;
+                    int productWarrantyMonths = 12; // default
+                    if (productCode != null && !productCode.trim().isEmpty()) {
+                        selectProductStmt.setString(1, productCode.trim());
+                        try (ResultSet prs = selectProductStmt.executeQuery()) {
+                            if (prs.next()) {
+                                productId = prs.getInt("product_id");
+                                try {
+                                    productWarrantyMonths = prs.getInt("warranty_period_months");
+                                    if (prs.wasNull()) productWarrantyMonths = 12;
+                                } catch (SQLException ignore) {
+                                    productWarrantyMonths = 12;
+                                }
+                            }
+                        }
+
+                        if (productId == null) {
+                            insertProductStmt.setString(1, productCode.trim());
+                            insertProductStmt.setString(2, productName != null ? productName.trim() : "");
+                            insertProductStmt.setString(3, description != null ? description.trim() : "");
+                            insertProductStmt.executeUpdate();
+                            try (ResultSet pkeys = insertProductStmt.getGeneratedKeys()) {
+                                if (pkeys.next()) {
+                                    productId = pkeys.getInt(1);
+                                }
+                            }
+                        }
+                    }
+
+                    // --- Insert serial and link to customer (if serial provided) ---
+                    if (serialNumber != null && !serialNumber.trim().isEmpty() && productId != null) {
+                        // skip if serial already exists
+                        selectSerialStmt.setString(1, serialNumber.trim());
+                        try (ResultSet srs = selectSerialStmt.executeQuery()) {
+                            if (srs.next()) {
+                                // already exists, skip
+                                continue;
+                            }
+                        }
+
+                        java.sql.Date purchaseDate = java.sql.Date.valueOf(java.time.LocalDate.now());
+                        java.sql.Date warrantyStart = purchaseDate;
+                        java.sql.Date warrantyEnd = java.sql.Date.valueOf(java.time.LocalDate.now().plusMonths(productWarrantyMonths));
+
+                        // Parse purchase price
+                        java.math.BigDecimal purchasePrice = java.math.BigDecimal.ZERO;
+                        try {
+                            if (priceStr != null && !priceStr.trim().isEmpty()) {
+                                purchasePrice = new java.math.BigDecimal(priceStr.trim());
+                            }
+                        } catch (NumberFormatException e) {
+                            purchasePrice = java.math.BigDecimal.ZERO;
+                        }
+
+                        insertSerialStmt.setInt(1, productId);
+                        insertSerialStmt.setString(2, serialNumber.trim());
+                        insertSerialStmt.setObject(3, customerId == null ? null : customerId);
+                        insertSerialStmt.setDate(4, purchaseDate);
+                        insertSerialStmt.setDate(5, warrantyStart);
+                        insertSerialStmt.setDate(6, warrantyEnd);
+                        insertSerialStmt.setBigDecimal(7, purchasePrice);
+                        insertSerialStmt.executeUpdate();
+                    }
+
+                    count++;
+                } catch (Exception e) {
+                    System.err.println("Lỗi xử lý customer+product row " + (i+1) + ": " + e.getMessage());
+                }
+            }
+        }
+
         return count;
     }
     

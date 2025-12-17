@@ -75,10 +75,10 @@
                     
                     <hr style="border-color: rgba(255,255,255,0.3)">
                     
-                    <a href="${pageContext.request.contextPath}/views/admin/dashboard.jsp">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/admin/import-excel.jsp" class="active">
+                    <a href="${pageContext.request.contextPath}/admin/import-excel" class="active">
                         <i class="fas fa-file-excel"></i> Import Excel
                     </a>
                     <a href="${pageContext.request.contextPath}/views/admin/customers.jsp">
@@ -106,7 +106,7 @@
             <main class="col-md-10 ms-sm-auto px-4 py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="fas fa-file-excel text-success"></i> Import dữ liệu Excel</h2>
-                    <a href="${pageContext.request.contextPath}/views/admin/dashboard.jsp" class="btn btn-outline-secondary">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                 </div>

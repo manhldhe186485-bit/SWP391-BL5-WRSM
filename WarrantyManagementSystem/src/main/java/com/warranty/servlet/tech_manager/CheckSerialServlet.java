@@ -15,8 +15,9 @@ import java.time.temporal.ChronoUnit;
 
 /**
  * API servlet to check if serial exists and return warranty info
+ * Used by both Tech Manager and Technician
  */
-@WebServlet("/tech-manager/check-serial")
+@WebServlet(urlPatterns = {"/tech-manager/check-serial", "/technician/check-serial"})
 public class CheckSerialServlet extends HttpServlet {
 
     private ProductSerialDAO productSerialDAO = new ProductSerialDAO();

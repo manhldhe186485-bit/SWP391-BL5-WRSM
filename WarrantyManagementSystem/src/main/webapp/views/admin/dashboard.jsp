@@ -71,7 +71,7 @@
                     
                     <hr style="border-color: rgba(255,255,255,0.3)">
                     
-                    <a href="${pageContext.request.contextPath}/views/admin/dashboard.jsp" class="active">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="active">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                     <a href="${pageContext.request.contextPath}/admin/import-excel">
@@ -124,7 +124,7 @@
                         <div class="stat-card blue">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${totalCustomers != null ? totalCustomers : 0}</h3>
                                     <small>Tổng khách hàng</small>
                                 </div>
                                 <i class="fas fa-users fa-3x opacity-50"></i>
@@ -135,7 +135,7 @@
                         <div class="stat-card green">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${totalProductsSold != null ? totalProductsSold : 0}</h3>
                                     <small>Sản phẩm đã bán</small>
                                 </div>
                                 <i class="fas fa-box fa-3x opacity-50"></i>
@@ -146,7 +146,7 @@
                         <div class="stat-card orange">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${totalWarrantyTickets != null ? totalWarrantyTickets : 0}</h3>
                                     <small>Đơn bảo hành</small>
                                 </div>
                                 <i class="fas fa-ticket-alt fa-3x opacity-50"></i>
@@ -157,7 +157,7 @@
                         <div class="stat-card red">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h3 class="mb-0">0</h3>
+                                    <h3 class="mb-0">${totalEmployees != null ? totalEmployees : 0}</h3>
                                     <small>Nhân viên</small>
                                 </div>
                                 <i class="fas fa-user-tie fa-3x opacity-50"></i>
@@ -176,21 +176,21 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <a href="${pageContext.request.contextPath}/views/admin/import-excel.jsp" 
+                                        <a href="${pageContext.request.contextPath}/admin/import-excel" 
                                            class="btn btn-lg btn-outline-primary w-100 mb-3">
                                             <i class="fas fa-file-upload fa-2x d-block mb-2"></i>
                                             Import dữ liệu Excel
                                         </a>
                                     </div>
                                     <div class="col-md-4">
-                                        <a href="${pageContext.request.contextPath}/views/admin/customers.jsp" 
+                                        <a href="${pageContext.request.contextPath}/admin/customers" 
                                            class="btn btn-lg btn-outline-success w-100 mb-3">
                                             <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
                                             Thêm khách hàng mới
                                         </a>
                                     </div>
                                     <div class="col-md-4">
-                                        <a href="${pageContext.request.contextPath}/views/admin/products.jsp" 
+                                        <a href="${pageContext.request.contextPath}/admin/products" 
                                            class="btn btn-lg btn-outline-info w-100 mb-3">
                                             <i class="fas fa-box-open fa-2x d-block mb-2"></i>
                                             Thêm sản phẩm mới

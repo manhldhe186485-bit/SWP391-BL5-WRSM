@@ -111,16 +111,6 @@
         <url-pattern>/admin/import-excel</url-pattern>
     </servlet-mapping>
 
-    <!-- Customer Management Servlet -->
-    <servlet>
-        <servlet-name>CustomerManagementServlet</servlet-name>
-        <servlet-class>com.warranty.servlet.CustomerManagementServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>CustomerManagementServlet</servlet-name>
-        <url-pattern>/admin/customers</url-pattern>
-    </servlet-mapping>
-
     <!-- Test Import Servlet -->
     <servlet>
         <servlet-name>TestImportServlet</servlet-name>

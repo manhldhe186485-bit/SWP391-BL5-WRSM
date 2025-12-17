@@ -205,9 +205,6 @@
         <div class="actions">
             <h2>Thao Tác Nhanh</h2>
             <div class="action-buttons">
-                <a href="${pageContext.request.contextPath}/tech-manager/receive-product" class="btn btn-primary">
-                    Tiếp Nhận Sản Phẩm BH
-                </a>
                 <a href="${pageContext.request.contextPath}/tech-manager/assign-ticket" class="btn btn-primary">
                     Phân Công Kỹ Thuật Viên
                 </a>

@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -13,6 +13,7 @@
         .main-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .header-section { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 30px; border-radius: 15px 15px 0 0; }
         .table-container { max-height: 600px; overflow-y: auto; }
+        .form-section { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -20,82 +21,156 @@
         <div class="main-card">
             <div class="header-section">
                 <h1><i class="fas fa-users me-3"></i>Quản Lý Khách Hàng</h1>
-                <p class="mb-0">Danh sách khách hàng đã import từ Excel</p>
+                <p class="mb-0">Thêm, sửa, xóa khách hàng trong hệ thống</p>
             </div>
             
             <div class="p-4">
-                <c:if test="${not empty error}">
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>${error}
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${sessionScope.successMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
+                    <c:remove var="successMessage" scope="session"/>
                 </c:if>
                 
-                <c:if test="${not empty customers}">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5>Tổng cộng: <span class="badge bg-primary">${customers.size()}</span> khách hàng</h5>
-                        <a href="${pageContext.request.contextPath}/admin/import-excel" class="btn btn-success">
-                            <i class="fas fa-plus me-2"></i>Import thêm
-                        </a>
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>${sessionScope.errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
+                    <c:remove var="errorMessage" scope="session"/>
+                </c:if>
+
+                <div class="form-section">
+                    <h4 class="mb-3">
+                        <c:choose>
+                            <c:when test="${not empty editMode}">
+                                <i class="fas fa-edit me-2"></i>Cập Nhật Khách Hàng
+                            </c:when>
+                            <c:otherwise>
+                                <i class="fas fa-plus-circle me-2"></i>Thêm Khách Hàng Mới
+                            </c:otherwise>
+                        </c:choose>
+                    </h4>
                     
-                    <div class="table-container">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Họ tên</th>
-                                    <th>Email</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Địa chỉ</th>
-                                    <th>Ngày tạo</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="customer" items="${customers}">
+                    <form action="${pageContext.request.contextPath}/admin/customers" method="post">
+                        <input type="hidden" name="action" value="${not empty editMode ? 'update' : 'create'}">
+                        <c:if test="${not empty editMode}">
+                            <input type="hidden" name="customerId" value="${customer.customerId}">
+                        </c:if>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="fullName" class="form-label">Họ và Tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" value="${customer.fullName}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="${customer.email}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Số Điện Thoại <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="${customer.phone}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="address" class="form-label">Địa Chỉ</label>
+                                <input type="text" class="form-control" id="address" name="address" value="${customer.address}">
+                            </div>
+                            
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-save me-2"></i>${not empty editMode ? 'Cập Nhật' : 'Thêm Mới'}
+                                </button>
+                                <c:if test="${not empty editMode}">
+                                    <a href="${pageContext.request.contextPath}/admin/customers" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Hủy
+                                    </a>
+                                </c:if>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <h4 class="mb-3"><i class="fas fa-list me-2"></i>Danh Sách Khách Hàng</h4>
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ Tên</th>
+                                <th>Email</th>
+                                <th>Số Điện Thoại</th>
+                                <th>Địa Chỉ</th>
+                                <th>Ngày Tạo</th>
+                                <th class="text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:choose>
+                                <c:when test="${empty customers}">
                                     <tr>
-                                        <td>${customer.customerId}</td>
-                                        <td><strong>${customer.fullName}</strong></td>
-                                        <td>
-                                            <c:if test="${not empty customer.email}">
-                                                <i class="fas fa-envelope text-primary me-1"></i>${customer.email}
-                                            </c:if>
-                                        </td>
-                                        <td>
-                                            <c:if test="${not empty customer.phone}">
-                                                <i class="fas fa-phone text-success me-1"></i>${customer.phone}
-                                            </c:if>
-                                        </td>
-                                        <td>${customer.address}</td>
-                                        <td>
-                                            <small class="text-muted">
-                                                ${customer.createdAt}
-                                            </small>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                                            <p>Chưa có khách hàng nào trong hệ thống</p>
                                         </td>
                                     </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                </c:if>
-                
-                <c:if test="${empty customers}">
-                    <div class="text-center py-5">
-                        <i class="fas fa-users fa-4x text-muted mb-3"></i>
-                        <h4 class="text-muted">Chưa có khách hàng nào</h4>
-                        <p>Hãy import file Excel để thêm khách hàng</p>
-                        <a href="${pageContext.request.contextPath}/admin/import-excel" class="btn btn-primary">
-                            <i class="fas fa-upload me-2"></i>Import Excel
-                        </a>
-                    </div>
-                </c:if>
-                
-                <div class="text-center mt-4">
-                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Quay lại Dashboard
+                                </c:when>
+                                <c:otherwise>
+                                    <c:forEach var="cust" items="${customers}">
+                                        <tr>
+                                            <td>${cust.customerId}</td>
+                                            <td><strong>${cust.fullName}</strong></td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty cust.email}">
+                                                        <i class="fas fa-envelope me-1"></i>${cust.email}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted">-</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td><i class="fas fa-phone me-1"></i>${cust.phone}</td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty cust.address}">${cust.address}</c:when>
+                                                    <c:otherwise><span class="text-muted">-</span></c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <i class="far fa-calendar me-1"></i>
+                                                <c:choose>
+                                                    <c:when test="${not empty cust.createdAt}">${cust.createdAt}</c:when>
+                                                    <c:otherwise><span class="text-muted">-</span></c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="${pageContext.request.contextPath}/admin/customers?action=edit&id=${cust.customerId}" class="btn btn-sm btn-warning me-1" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/admin/customers?action=delete&id=${cust.customerId}" class="btn btn-sm btn-danger" title="Xóa" onclick="return confirm('Bạn có chắc muốn xóa khách hàng ${cust.fullName}?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay Lại Dashboard
                     </a>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

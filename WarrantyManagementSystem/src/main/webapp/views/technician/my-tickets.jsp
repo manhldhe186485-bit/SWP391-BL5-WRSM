@@ -66,6 +66,9 @@
                     <a href="${pageContext.request.contextPath}/technician/dashboard">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
+                    <a href="${pageContext.request.contextPath}/technician/receive-product">
+                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                    </a>
                     <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp" class="active">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
                     </a>
