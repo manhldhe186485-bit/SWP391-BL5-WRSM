@@ -104,7 +104,23 @@ public class RepairTicketDAO {
      */
     public List<RepairTicket> getTicketsByStatus(TicketStatus status) {
         List<RepairTicket> tickets = new ArrayList<>();
-        String sql = "SELECT * FROM repair_tickets WHERE status = ? ORDER BY received_date DESC";
+        
+        // JOIN với repair_progress_logs để lấy status mới nhất
+        String sql = "SELECT rt.*, " +
+                    "       COALESCE(latest_log.status, rt.status) as current_status, " +
+                    "       latest_log.completion_percentage " +
+                    "FROM repair_tickets rt " +
+                    "LEFT JOIN ( " +
+                    "    SELECT rpl.ticket_id, rpl.status, rpl.completion_percentage, rpl.created_at " +
+                    "    FROM repair_progress_logs rpl " +
+                    "    INNER JOIN ( " +
+                    "        SELECT ticket_id, MAX(created_at) as max_date " +
+                    "        FROM repair_progress_logs " +
+                    "        GROUP BY ticket_id " +
+                    "    ) latest ON rpl.ticket_id = latest.ticket_id AND rpl.created_at = latest.max_date " +
+                    ") latest_log ON rt.ticket_id = latest_log.ticket_id " +
+                    "WHERE COALESCE(latest_log.status, rt.status) = ? " +
+                    "ORDER BY rt.received_date DESC";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -113,7 +129,19 @@ public class RepairTicketDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    tickets.add(extractTicketFromResultSet(rs));
+                    RepairTicket ticket = extractTicketFromResultSet(rs);
+                    
+                    // Ghi đè status từ progress_logs nếu có
+                    String currentStatus = rs.getString("current_status");
+                    if (currentStatus != null && !currentStatus.isEmpty()) {
+                        try {
+                            ticket.setStatus(RepairTicket.TicketStatus.valueOf(currentStatus));
+                        } catch (IllegalArgumentException e) {
+                            // Keep original status if conversion fails
+                        }
+                    }
+                    
+                    tickets.add(ticket);
                 }
             }
             
@@ -128,8 +156,23 @@ public class RepairTicketDAO {
      */
     public List<RepairTicket> getTicketsByTechnician(int technicianId) {
         List<RepairTicket> tickets = new ArrayList<>();
-        String sql = "SELECT * FROM repair_tickets WHERE assigned_technician_id = ? " +
-                    "ORDER BY received_date DESC";
+        
+        // JOIN với repair_progress_logs để lấy status mới nhất
+        String sql = "SELECT rt.*, " +
+                    "       COALESCE(latest_log.status, rt.status) as current_status, " +
+                    "       latest_log.completion_percentage " +
+                    "FROM repair_tickets rt " +
+                    "LEFT JOIN ( " +
+                    "    SELECT rpl.ticket_id, rpl.status, rpl.completion_percentage, rpl.created_at " +
+                    "    FROM repair_progress_logs rpl " +
+                    "    INNER JOIN ( " +
+                    "        SELECT ticket_id, MAX(created_at) as max_date " +
+                    "        FROM repair_progress_logs " +
+                    "        GROUP BY ticket_id " +
+                    "    ) latest ON rpl.ticket_id = latest.ticket_id AND rpl.created_at = latest.max_date " +
+                    ") latest_log ON rt.ticket_id = latest_log.ticket_id " +
+                    "WHERE rt.assigned_technician_id = ? " +
+                    "ORDER BY rt.received_date DESC";
         
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -138,7 +181,19 @@ public class RepairTicketDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    tickets.add(extractTicketFromResultSet(rs));
+                    RepairTicket ticket = extractTicketFromResultSet(rs);
+                    
+                    // Ghi đè status từ progress_logs nếu có
+                    String currentStatus = rs.getString("current_status");
+                    if (currentStatus != null && !currentStatus.isEmpty()) {
+                        try {
+                            ticket.setStatus(RepairTicket.TicketStatus.valueOf(currentStatus));
+                        } catch (IllegalArgumentException e) {
+                            // Keep original status if conversion fails
+                        }
+                    }
+                    
+                    tickets.add(ticket);
                 }
             }
             

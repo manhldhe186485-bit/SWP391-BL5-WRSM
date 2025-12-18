@@ -34,10 +34,10 @@ public class UpdateProgressServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User user = (User) session.getAttribute("user");
         
-
-
-        // Load tickets assigned to this technician
-        List<RepairTicket> myTickets = repairTicketDAO.getTicketsByTechnician(user.getUserId());
+        // Load tickets assigned to this technician - Dùng SERVICE thay vì DAO trực tiếp
+        // Service sẽ tự động load related objects (Customer, ProductSerial)
+        List<RepairTicket> myTickets = repairTicketService.getTicketsByTechnician(user.getUserId());
+        
         request.setAttribute("myTickets", myTickets);
 
         // Forward to update progress page
@@ -75,12 +75,12 @@ public class UpdateProgressServlet extends HttpServlet {
             System.out.println("DEBUG - Description: " + description);
             System.out.println("DEBUG - Technician ID: " + user.getUserId());
             
-            // ========== GỌI SERVICE ĐỂ CẬP NHẬT WARRANTY_TICKETS ==========
+            // ========== GỌI SERVICE ĐỂ CẬP NHẬT repair_tickets ==========
             System.out.println("DEBUG - Calling repairTicketService.updateTicketStatus()...");
             boolean success = false;
             try {
                 success = true;
-                System.out.println("DEBUG - Update warranty_tickets status: " + (success ? "SUCCESS" : "FAILED"));
+                System.out.println("DEBUG - Update repair_tickets status: " + (success ? "SUCCESS" : "FAILED"));
             } catch (Exception ex) {
                 System.err.println("ERROR - Exception in updateTicketStatus:");
                 ex.printStackTrace();
@@ -119,7 +119,7 @@ public class UpdateProgressServlet extends HttpServlet {
                 // TODO: Send notification to customer if checkbox is checked
                 
                 request.getSession().setAttribute("successMessage", "Cập nhật tiến độ thành công!");
-                response.sendRedirect(request.getContextPath() + "/technician/my-tickets");
+                response.sendRedirect(request.getContextPath() + "/technician/update-progress");
             } else {
                 request.setAttribute("error", "Không thể cập nhật tiến độ. Vui lòng thử lại.");
                 request.getRequestDispatcher("/views/technician/update-progress.jsp").forward(request, response);

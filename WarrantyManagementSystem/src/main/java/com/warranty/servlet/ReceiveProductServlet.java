@@ -161,8 +161,19 @@ public class ReceiveProductServlet extends HttpServlet {
             // ========== BƯỚC 3: TẠO PHIẾU TIẾP NHẬN (RMA) ==========
             RepairTicket ticket = new RepairTicket();
             
-            // Generate ticket number
-            String ticketNumber = generateTicketCode();
+            // Lấy tên sản phẩm
+            String productName = "UNKNOWN";
+            if (productSerial != null && productSerial.getProduct() != null) {
+                productName = productSerial.getProduct().getProductName();
+            } else if (productSerial != null) {
+                // Nếu chưa load Product, dùng serial number
+                productName = serialNumber;
+            }
+            
+            // Generate ticket number với tên sản phẩm
+            // hasSerial = true nếu có serial trong hệ thống và còn bảo hành
+            boolean hasSerial = (productSerial != null && !isWalkIn);
+            String ticketNumber = generateTicketCode(hasSerial, productName);
             ticket.setTicketNumber(ticketNumber);
             
             // Set required fields matching database schema
@@ -200,13 +211,18 @@ public class ReceiveProductServlet extends HttpServlet {
             boolean success = repairTicketService.createRepairTicket(ticket);
 
             if (success) {
-                // Set success message
+                // Get the ticket ID after creation
+                int ticketId = ticket.getTicketId();
+                
+                // Set success message with PDF download link
                 request.getSession().setAttribute("message", 
                     "Tiếp nhận thành công! Mã phiếu: " + ticketNumber + 
                     " - " + warrantyStatus);
+                request.getSession().setAttribute("newTicketId", ticketId);
+                request.getSession().setAttribute("showPdfDownload", true);
                 
-                // Redirect to technician dashboard
-                response.sendRedirect(request.getContextPath() + "/technician/dashboard");
+                // Redirect to receive product page with success
+                response.sendRedirect(request.getContextPath() + "/technician/receive-product?success=true");
             } else {
                 throw new Exception("Không thể tạo phiếu tiếp nhận!");
             }
@@ -223,13 +239,28 @@ public class ReceiveProductServlet extends HttpServlet {
 
     /**
      * Generate unique ticket code
-     * Format: WR-YYYY-NNNN
+     * Format: 
+     * - Có serial (bảo hành): WR-YYYY-NNNN-TenSanPham
+     * - Không serial (sửa chữa): RP-YYYY-NNNN-TenSanPham
      */
-    private String generateTicketCode() {
+    private String generateTicketCode(boolean hasSerial, String productName) {
         int year = java.time.Year.now().getValue();
         // TODO: Get count from database
         int count = (int)(Math.random() * 9999) + 1;
-        return String.format("WR-%d-%04d", year, count);
+        
+        // Prefix: WR = Warranty, RP = Repair
+        String prefix = hasSerial ? "WR" : "RP";
+        
+        // Clean product name: remove special chars, limit length
+        String cleanProductName = productName
+            .replaceAll("[^a-zA-Z0-9]", "") // Remove special characters
+            .toUpperCase(); // Uppercase
+        
+        if (cleanProductName.length() > 10) {
+            cleanProductName = cleanProductName.substring(0, 10);
+        }
+        
+        return String.format("%s-%d-%04d-%s", prefix, year, count, cleanProductName);
     }
 
     /**

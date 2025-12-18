@@ -13,24 +13,19 @@
     <style>
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
         }
-        .nav-link {
+        .sidebar a {
             color: rgba(255,255,255,0.8);
+            text-decoration: none;
             padding: 12px 20px;
-            margin: 4px 0;
-            border-radius: 8px;
+            display: block;
             transition: all 0.3s;
         }
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        .nav-link.active {
+        .sidebar a:hover, .sidebar a.active {
             background: rgba(255,255,255,0.2);
             color: white;
-            font-weight: 600;
-            border-left: 4px solid #fff;
         }
         .content-area {
             background-color: #f8f9fa;
@@ -92,33 +87,46 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 sidebar p-0">
+            <nav class="col-md-2 d-md-block sidebar">
                 <div class="p-3">
-                    <h4 class="text-white text-center mb-4">
-                        <i class="fas fa-tools"></i> Kỹ Thuật Viên
+                    <h4 class="text-center mb-4">
+                        <i class="fas fa-wrench"></i> Kỹ Thuật
                     </h4>
-                    <nav class="nav flex-column">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/technician/dashboard">
-                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                        </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/technician/receive-product">
-                            <i class="fas fa-box-open me-2"></i>Nhận sản phẩm
-                        </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/technician/my-tickets">
-                            <i class="fas fa-ticket-alt me-2"></i>Đơn của tôi
-                        </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/technician/request-parts">
-                            <i class="fas fa-cogs me-2"></i>Yêu cầu linh kiện
-                        </a>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/technician/update-progress">
-                            <i class="fas fa-tasks me-2"></i>Cập nhật tiến độ
-                        </a>
-                        <a class="nav-link active" href="${pageContext.request.contextPath}/technician/create-invoice">
-                            <i class="fas fa-file-invoice-dollar me-2"></i>Tạo phiếu thanh toán
-                        </a>
-                    </nav>
+                    <hr style="border-color: rgba(255,255,255,0.3)">
+                    
+                    <div class="mb-3">
+                        <small class="text-white-50">Xin chào,</small>
+                        <div class="fw-bold">${sessionScope.fullName}</div>
+                    </div>
+                    
+                    <hr style="border-color: rgba(255,255,255,0.3)">
+                    
+                    <a class="nav-link" href="${pageContext.request.contextPath}/technician/dashboard">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/technician/receive-product">
+                        <i class="fas fa-inbox"></i> Tiếp nhận sản phẩm
+                    </a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/technician/my-tickets">
+                        <i class="fas fa-clipboard-list"></i> Đơn của tôi
+                    </a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/technician/request-parts">
+                        <i class="fas fa-toolbox"></i> Yêu cầu linh kiện
+                    </a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/technician/update-progress">
+                        <i class="fas fa-tasks"></i> Cập nhật tiến độ
+                    </a>
+                    <a class="nav-link active" href="${pageContext.request.contextPath}/technician/create-invoice">
+                        <i class="fas fa-receipt"></i> Tạo phiếu thanh toán
+                    </a>
+                    
+                    <hr style="border-color: rgba(255,255,255,0.3)">
+                    
+                    <a class="nav-link" href="${pageContext.request.contextPath}/logout">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
                 </div>
-            </div>
+            </nav>
 
             <!-- Main Content -->
             <div class="col-md-10 content-area p-4">
@@ -171,9 +179,15 @@
                                                 <c:forEach var="ticket" items="${completedTickets}">
                                                     <option value="${ticket.ticketId}" 
                                                             data-ticket-number="${ticket.ticketNumber}"
-                                                            data-product="${ticket.productName}"
-                                                            data-customer="${ticket.customerName}">
-                                                        ${ticket.ticketNumber} - ${ticket.productName}
+                                                            data-product="${ticket.productSerial != null and ticket.productSerial.product != null ? ticket.productSerial.product.productName : 'N/A'}"
+                                                            data-customer="${ticket.customer != null ? ticket.customer.fullName : 'N/A'}">
+                                                        ${ticket.ticketNumber} - 
+                                                        <c:choose>
+                                                            <c:when test="${ticket.productSerial != null and ticket.productSerial.product != null}">
+                                                                ${ticket.productSerial.product.productName}
+                                                            </c:when>
+                                                            <c:otherwise>N/A</c:otherwise>
+                                                        </c:choose>
                                                     </option>
                                                 </c:forEach>
                                             </c:otherwise>
@@ -202,10 +216,10 @@
                                 <!-- Labor Cost -->
                                 <div class="col-md-6 mb-4">
                                     <label for="laborCost" class="form-label">
-                                        <i class="fas fa-user-cog me-2"></i>Chi phí nhân công (VNĐ)
+                                        <i class="fas fa-user-cog me-2"></i>Phí dịch vụ (VNĐ)
                                     </label>
                                     <input type="number" class="form-control" id="laborCost" name="laborCost" 
-                                           step="1000" min="0" value="0" required>
+                                           step="1" min="0" value="0" required>
                                     <small class="text-muted">Nhập chi phí công sửa chữa</small>
                                 </div>
 
@@ -215,7 +229,7 @@
                                         <i class="fas fa-cogs me-2"></i>Chi phí linh kiện (VNĐ)
                                     </label>
                                     <input type="number" class="form-control" id="partsCost" name="partsCost" 
-                                           step="1000" min="0" value="0" required>
+                                           step="1" min="0" value="0" required>
                                     <small class="text-muted">Nhập tổng chi phí linh kiện thay thế</small>
                                 </div>
 
@@ -233,7 +247,7 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="cost-display">
-                                                <div class="cost-label">Chi phí nhân công</div>
+                                                <div class="cost-label">Phí dịch vụ</div>
                                                 <div class="cost-value" id="displayLaborCost">0 ₫</div>
                                             </div>
                                         </div>
@@ -278,6 +292,7 @@
 
         // Update ticket info when selection changes
         document.getElementById('ticketId').addEventListener('change', function() {
+            console.log('Dropdown changed! Value:', this.value);
             const option = this.options[this.selectedIndex];
             const ticketInfo = document.getElementById('ticketInfo');
             
@@ -286,11 +301,16 @@
                 const product = option.getAttribute('data-product');
                 const customer = option.getAttribute('data-customer');
                 
-                ticketInfo.innerHTML = `
-                    <div><strong>Mã đơn:</strong> ${ticketNumber}</div>
-                    <div><strong>Sản phẩm:</strong> ${product}</div>
-                    <div><strong>Khách hàng:</strong> ${customer}</div>
-                `;
+                console.log('Data attributes:', {
+                    ticketNumber: ticketNumber,
+                    product: product,
+                    customer: customer
+                });
+                
+                ticketInfo.innerHTML = 
+                    '<div><strong>Mã đơn:</strong> ' + ticketNumber + '</div>' +
+                    '<div><strong>Sản phẩm:</strong> ' + product + '</div>' +
+                    '<div><strong>Khách hàng:</strong> ' + customer + '</div>';
             } else {
                 ticketInfo.innerHTML = '<small class="text-muted">Chọn đơn để xem thông tin</small>';
             }
@@ -324,7 +344,7 @@
 
             if (laborCost === 0 && partsCost === 0) {
                 e.preventDefault();
-                alert('Chi phí nhân công hoặc chi phí linh kiện phải lớn hơn 0!');
+                alert('Phí dịch vụ hoặc chi phí linh kiện phải lớn hơn 0!');
                 return false;
             }
 

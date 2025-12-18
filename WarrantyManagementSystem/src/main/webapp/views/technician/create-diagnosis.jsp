@@ -227,7 +227,7 @@
                 <!-- Cost Summary -->
                 <div class="cost-summary">
                     <div class="cost-row">
-                        <span>Chi phí nhân công:</span>
+                        <span>Phí dịch vụ:</span>
                         <span id="displayLaborCost">0 VNĐ</span>
                     </div>
                     <div class="cost-row">

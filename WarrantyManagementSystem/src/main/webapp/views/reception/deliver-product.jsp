@@ -176,7 +176,7 @@
                 <div class="cost-summary">
                     <h3>💰 Chi Phí Sửa Chữa</h3>
                     <div class="cost-row">
-                        <span>Chi phí nhân công:</span>
+                        <span>Phí dịch vụ:</span>
                         <span>${ticket.laborCost} VNĐ</span>
                     </div>
                     <div class="cost-row">

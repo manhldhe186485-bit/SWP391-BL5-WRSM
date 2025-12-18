@@ -102,7 +102,7 @@
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/receive-product">
-                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                        <i class="fas fa-inbox"></i> Tiếp nhận sản phẩm
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
@@ -206,13 +206,6 @@
                                            class="btn btn-lg btn-outline-primary w-100 mb-3">
                                             <i class="fas fa-list fa-2x d-block mb-2"></i>
                                             Xem đơn của tôi
-                                        </a>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <a href="${pageContext.request.contextPath}/technician/create-diagnosis" 
-                                           class="btn btn-lg btn-outline-success w-100 mb-3">
-                                            <i class="fas fa-edit fa-2x d-block mb-2"></i>
-                                            Tạo phiếu chẩn đoán
                                         </a>
                                     </div>
                                     <div class="col-md-3">

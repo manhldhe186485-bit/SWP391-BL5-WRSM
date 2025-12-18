@@ -38,10 +38,24 @@ public class RequestPartsServlet extends HttpServlet {
 
         Integer technicianId = (Integer) request.getSession().getAttribute("userId");
         
-        // ========== LẤY DANH SÁCH ĐƠN BẢO HÀNH CỦA TECHNICIAN ==========
+        System.out.println("========== RequestPartsServlet.doGet() ==========");
+        System.out.println("Technician ID: " + technicianId);
+        
+        // ========== LẤY DANH SÁCH ĐƠN BẢO HÀNH CỦA TECHNICIAN (CHỈ WAITING_PARTS) ==========
         try {
-            List<RepairTicket> myTickets = repairTicketDAO.getTicketsByTechnician(technicianId);
-            request.setAttribute("myTickets", myTickets);
+            List<RepairTicket> allTickets = repairTicketDAO.getTicketsByTechnician(technicianId);
+            System.out.println("All Tickets loaded: " + allTickets.size());
+            
+            // Filter chỉ lấy đơn WAITING_PARTS
+            List<RepairTicket> waitingPartsTickets = new ArrayList<>();
+            for (RepairTicket ticket : allTickets) {
+                if ("WAITING_PARTS".equals(ticket.getStatus())) {
+                    waitingPartsTickets.add(ticket);
+                }
+            }
+            
+            System.out.println("WAITING_PARTS Tickets: " + waitingPartsTickets.size());
+            request.setAttribute("myTickets", waitingPartsTickets);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("myTickets", new ArrayList<>());
@@ -50,9 +64,18 @@ public class RequestPartsServlet extends HttpServlet {
         // ========== LẤY LỊCH SỬ YÊU CẦU CỦA TECHNICIAN ==========
         try {
             List<PartsRequest> myRequests = partsRequestDAO.getRequestsByTechnician(technicianId);
+            System.out.println("My Requests loaded: " + myRequests.size());
+            
+            // Log chi tiết các request
+            for (PartsRequest req : myRequests) {
+                System.out.println("  - Request ID: " + req.getRequestId() + 
+                                 ", Number: " + req.getRequestNumber() + 
+                                 ", Status: " + req.getStatus());
+            }
             
             request.setAttribute("myRequests", myRequests);
         } catch (SQLException e) {
+            System.err.println("ERROR loading requests: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("myRequests", new ArrayList<>());
         }
@@ -75,16 +98,26 @@ public class RequestPartsServlet extends HttpServlet {
         }
 
         try {
+            System.out.println("========== REQUEST PARTS: BẮT ĐẦU ==========");
+            
             // ========== BƯỚC 1: LẤY THÔNG TIN TỪ FORM ==========
             int ticketId = Integer.parseInt(request.getParameter("ticketId"));
             String priority = request.getParameter("priority");
             String notes = request.getParameter("notes");
+
+            System.out.println("Ticket ID: " + ticketId);
+            System.out.println("Priority: " + priority);
+            System.out.println("Notes: " + notes);
 
             // Get array of parts
             String[] partNames = request.getParameterValues("partName[]");
             String[] partCodes = request.getParameterValues("partCode[]");
             String[] quantities = request.getParameterValues("quantity[]");
             String[] partNotes = request.getParameterValues("partNote[]");
+
+            System.out.println("Part Names array: " + (partNames != null ? partNames.length + " items" : "NULL"));
+            System.out.println("Part Codes array: " + (partCodes != null ? partCodes.length + " items" : "NULL"));
+            System.out.println("Quantities array: " + (quantities != null ? quantities.length + " items" : "NULL"));
 
             if (partNames == null || partNames.length == 0) {
                 throw new IllegalArgumentException("Phải có ít nhất 1 linh kiện!");
@@ -109,31 +142,51 @@ public class RequestPartsServlet extends HttpServlet {
                     item.setQuantityRequested(Integer.parseInt(quantities[i]));
                     item.setNotes(partNotes[i] != null ? partNotes[i].trim() : "");
                     items.add(item);
+                    
+                    System.out.println("  Item " + (i+1) + ": " + partNames[i] + " - Qty: " + quantities[i]);
                 }
             }
+
+            System.out.println("Total items created: " + items.size());
 
             if (items.isEmpty()) {
                 throw new IllegalArgumentException("Phải có ít nhất 1 linh kiện hợp lệ!");
             }
 
             // ========== BƯỚC 4: LƯU VÀO DATABASE ==========
+            System.out.println("========== Calling partsRequestDAO.createRequest() ==========");
             boolean success = partsRequestDAO.createRequest(partsRequest, items);
+            System.out.println("Result: " + (success ? "SUCCESS ✓" : "FAILED ✗"));
+            System.out.println("Generated Request ID: " + partsRequest.getRequestId());
+            System.out.println("========== REQUEST PARTS: KẾT THÚC ==========");
 
             if (success) {
                 // TODO: Send notification to warehouse staff
                 // TODO: Update ticket status to WAITING_PARTS
                 
-                request.getSession().setAttribute("successMessage", 
-                    "Đã gửi yêu cầu " + items.size() + " loại linh kiện tới kho!");
+                String successMsg = "Đã gửi yêu cầu " + items.size() + " loại linh kiện tới kho! (ID: " + partsRequest.getRequestId() + ")";
+                System.out.println("✓ " + successMsg);
+                request.getSession().setAttribute("successMessage", successMsg);
                 response.sendRedirect(request.getContextPath() + "/technician/request-parts");
             } else {
+                System.err.println("✗ FAILED: createRequest returned false");
                 throw new Exception("Không thể tạo yêu cầu linh kiện!");
             }
 
         } catch (IllegalArgumentException e) {
+            System.err.println("✗ IllegalArgumentException: " + e.getMessage());
+            e.printStackTrace();
             request.setAttribute("error", e.getMessage());
             doGet(request, response);
+        } catch (SQLException e) {
+            System.err.println("✗ SQLException: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi database: " + e.getMessage());
+            doGet(request, response);
         } catch (Exception e) {
+            System.err.println("✗ Exception: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             doGet(request, response);

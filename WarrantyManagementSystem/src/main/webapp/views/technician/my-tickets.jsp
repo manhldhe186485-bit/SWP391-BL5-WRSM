@@ -67,7 +67,7 @@
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/receive-product">
-                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                        <i class="fas fa-inbox"></i> Tiếp nhận sản phẩm
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/my-tickets" class="active">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
@@ -104,19 +104,19 @@
                     <div class="card-body">
                         <div class="btn-group w-100" role="group">
                             <button type="button" class="btn btn-outline-secondary filter-btn active" data-status="all">
-                                <i class="fas fa-list"></i> Tất cả <span class="badge bg-secondary ms-1">0</span>
+                                <i class="fas fa-list"></i> Tất cả <span class="badge bg-secondary ms-1">${totalCount != null ? totalCount : 0}</span>
                             </button>
                             <button type="button" class="btn btn-outline-info filter-btn" data-status="new">
-                                <i class="fas fa-plus-circle"></i> Mới <span class="badge bg-info ms-1">0</span>
+                                <i class="fas fa-plus-circle"></i> Mới <span class="badge bg-info ms-1">${newCount != null ? newCount : 0}</span>
                             </button>
                             <button type="button" class="btn btn-outline-warning filter-btn" data-status="in-progress">
-                                <i class="fas fa-spinner"></i> Đang sửa <span class="badge bg-warning text-dark ms-1">0</span>
+                                <i class="fas fa-spinner"></i> Đang sửa <span class="badge bg-warning text-dark ms-1">${inProgressCount != null ? inProgressCount : 0}</span>
                             </button>
                             <button type="button" class="btn btn-outline-danger filter-btn" data-status="waiting">
-                                <i class="fas fa-pause"></i> Chờ linh kiện <span class="badge bg-danger ms-1">0</span>
+                                <i class="fas fa-pause"></i> Chờ linh kiện <span class="badge bg-danger ms-1">${waitingCount != null ? waitingCount : 0}</span>
                             </button>
                             <button type="button" class="btn btn-outline-success filter-btn" data-status="completed">
-                                <i class="fas fa-check"></i> Hoàn thành <span class="badge bg-success ms-1">0</span>
+                                <i class="fas fa-check"></i> Hoàn thành <span class="badge bg-success ms-1">${completedCount != null ? completedCount : 0}</span>
                             </button>
                         </div>
                     </div>
@@ -141,7 +141,11 @@
                         <c:otherwise>
                             <!-- Tickets Cards -->
                             <c:forEach items="${tickets}" var="ticket">
-                                <div class="card ticket-card mb-3">
+                                <c:set var="statusClass" value="${ticket.status == 'ASSIGNED' ? 'new' : 
+                                                                    ticket.status == 'IN_PROGRESS' ? 'in-progress' : 
+                                                                    ticket.status == 'WAITING_PARTS' ? 'waiting' : 
+                                                                    ticket.status == 'COMPLETED' ? 'completed' : 'other'}" />
+                                <div class="card ticket-card mb-3" data-status="${statusClass}">
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-8">
@@ -153,10 +157,10 @@
                                                                     <span class="badge badge-new me-2">Mới</span>
                                                                 </c:when>
                                                                 <c:when test="${ticket.status == 'IN_PROGRESS'}">
-                                                                    <span class="badge badge-progress me-2">Đang sửa</span>
+                                                                    <span class="badge badge-in-progress me-2">Đang sửa</span>
                                                                 </c:when>
                                                                 <c:when test="${ticket.status == 'WAITING_PARTS'}">
-                                                                    <span class="badge badge-waiting me-2">Chờ linh kiện</span>
+                                                                    <span class="badge badge-waiting-parts me-2">Chờ linh kiện</span>
                                                                 </c:when>
                                                                 <c:when test="${ticket.status == 'COMPLETED'}">
                                                                     <span class="badge badge-completed me-2">Hoàn thành</span>
@@ -220,10 +224,6 @@
                                                         </span>
                                                     </c:when>
                                                 </c:choose>
-                                                <a href="${pageContext.request.contextPath}/technician/ticket-detail?id=${ticket.ticketId}" 
-                                                   class="btn btn-outline-secondary btn-sm w-100">
-                                                    <i class="fas fa-eye"></i> Xem chi tiết
-                                                </a>
                                             </div>
                                         </div>
                                     </div>

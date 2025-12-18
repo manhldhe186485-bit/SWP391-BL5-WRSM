@@ -88,7 +88,7 @@
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/receive-product">
-                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                        <i class="fas fa-inbox"></i> Tiếp nhận sản phẩm
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
@@ -115,10 +115,27 @@
             <main class="col-md-10 ms-sm-auto px-4 py-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="fas fa-tasks"></i> Cập nhật tiến độ sửa chữa</h2>
-                    <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp" class="btn btn-outline-secondary">
+                    <a href="${pageContext.request.contextPath}/technician/my-tickets" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                 </div>
+
+                <!-- Success/Error Messages -->
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${sessionScope.successMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <c:remove var="successMessage" scope="session"/>
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>${sessionScope.errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <c:remove var="errorMessage" scope="session"/>
+                </c:if>
 
                 <div class="row">
                     <!-- Select Ticket -->
@@ -131,13 +148,15 @@
                                 <select class="form-select" id="ticketSelect">
                                     <option value="">-- Chọn đơn bảo hành --</option>
                                     <c:forEach var="ticket" items="${myTickets}">
+                                        <c:set var="customerName" value="${ticket.customer != null ? ticket.customer.fullName : 'N/A'}" />
+                                        <c:set var="serialNumber" value="${ticket.productSerial != null ? ticket.productSerial.serialNumber : 'N/A'}" />
                                         <option value="${ticket.ticketId}"
                                                 data-ticket-number="${ticket.ticketNumber}"
-                                                data-customer="${ticket.customerName}"
-                                                data-product="${ticket.productName}"
+                                                data-customer="${customerName}"
+                                                data-product="${serialNumber}"
                                                 data-issue="${ticket.issueDescription}"
                                                 data-status="${ticket.status}">
-                                            ${ticket.ticketNumber} - ${ticket.productName}
+                                            ${ticket.ticketNumber} - ${serialNumber}
                                         </option>
                                     </c:forEach>
                                 </select>
@@ -154,19 +173,6 @@
                             </div>
                         </div>
 
-                        <!-- Current Progress Timeline -->
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0"><i class="fas fa-history"></i> Lịch sử cập nhật</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="timeline">
-                                    <div class="text-muted text-center py-3">
-                                        Chọn đơn để xem lịch sử
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Update Form -->
@@ -184,15 +190,11 @@
                                         <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
                                         <select class="form-select" name="status" required>
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="ASSIGNED">Đã giao việc</option>
-                                            <option value="IN_DIAGNOSIS">Đang chẩn đoán</option>
                                             <option value="IN_PROGRESS">Đang sửa chữa</option>
                                             <option value="WAITING_PARTS">Chờ linh kiện</option>
-                                            <option value="IN_REPAIR">Đang lắp ráp/kiểm tra</option>
                                             <option value="COMPLETED">Hoàn thành</option>
-                                            <option value="CANCELLED">Hủy bỏ</option>
                                         </select>
-                                        <small class="text-muted">Lưu ý: Tuân theo trình tự: ASSIGNED → IN_DIAGNOSIS → IN_PROGRESS → WAITING_PARTS (nếu cần) → IN_REPAIR → COMPLETED</small>
+                                    
                                     </div>
 
                                     <div class="mb-3">
@@ -202,23 +204,6 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Thời gian ước tính hoàn thành</label>
-                                                <input type="datetime-local" class="form-control" name="estimatedCompletion">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Mức độ ưu tiên</label>
-                                                <select class="form-select" name="priority">
-                                                    <option value="LOW">Thấp</option>
-                                                    <option value="MEDIUM" selected>Trung bình</option>
-                                                    <option value="HIGH">Cao</option>
-                                                    <option value="URGENT">Khẩn cấp</option>
-                                                </select>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <div class="mb-3">
@@ -257,21 +242,12 @@
                                                   placeholder="Ghi chú này sẽ được khách hàng nhìn thấy..."></textarea>
                                     </div>
 
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" name="notifyCustomer" id="notifyCustomer" checked>
-                                        <label class="form-check-label" for="notifyCustomer">
-                                            Gửi thông báo cho khách hàng
-                                        </label>
-                                    </div>
 
                                     <hr>
 
                                     <div class="d-grid gap-2">
                                         <button type="submit" class="btn btn-success btn-lg">
                                             <i class="fas fa-save"></i> Lưu cập nhật
-                                        </button>
-                                        <button type="reset" class="btn btn-outline-secondary">
-                                            <i class="fas fa-redo"></i> Làm mới
                                         </button>
                                     </div>
                                 </form>
@@ -336,6 +312,21 @@
             
             // Form will submit normally to server
             return true;
+        });
+
+        // Auto-select ticket from URL parameter
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketId = urlParams.get('ticketId');
+            
+            if (ticketId) {
+                const ticketSelect = document.getElementById('ticketSelect');
+                ticketSelect.value = ticketId;
+                
+                // Trigger change event to update ticket info
+                const event = new Event('change');
+                ticketSelect.dispatchEvent(event);
+            }
         });
 
         // Ticket selection

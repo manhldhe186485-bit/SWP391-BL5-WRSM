@@ -26,6 +26,11 @@ public class PartsRequest {
     private User technician;
     private User warehouseStaff;
     private List<PartsRequestItem> items;
+    private int itemCount; // Number of items in this request
+    
+    // Temporary fields for display (from JOIN queries)
+    private String ticketCode; // ticket_number from JOIN
+    private String ticketNumber; // alias for ticketCode
 
     public enum RequestStatus {
         PENDING, APPROVED, REJECTED, FULFILLED, CANCELLED
@@ -173,6 +178,14 @@ public class PartsRequest {
         this.items = items;
     }
 
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
     // Compatibility methods
     public String getPriority() {
         return "MEDIUM"; // default priority
@@ -209,9 +222,25 @@ public class PartsRequest {
         // This is a no-op setter for compatibility
     }
 
+    public String getTicketCode() {
+        if (ticket != null) {
+            return ticket.getTicketNumber();
+        }
+        return ticketCode;
+    }
+
     public void setTicketCode(String ticketCode) {
-        // Helper method - ticket code is handled through ticket ID
-        // This is a no-op setter for compatibility
+        this.ticketCode = ticketCode;
+        this.ticketNumber = ticketCode; // Keep both in sync
+    }
+
+    public String getTicketNumber() {
+        return getTicketCode(); // Delegate to ticketCode
+    }
+
+    public void setTicketNumber(String ticketNumber) {
+        this.ticketNumber = ticketNumber;
+        this.ticketCode = ticketNumber; // Keep both in sync
     }
 
     public void setProductSerialNumber(String productSerialNumber) {

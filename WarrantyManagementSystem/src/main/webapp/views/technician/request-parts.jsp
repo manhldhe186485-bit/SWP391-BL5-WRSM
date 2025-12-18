@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -56,7 +57,7 @@
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/receive-product">
-                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                        <i class="fas fa-inbox"></i> Tiếp nhận sản phẩm
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
@@ -81,13 +82,6 @@
 
             <!-- Main Content -->
             <main class="col-md-10 ms-sm-auto px-4 py-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="fas fa-toolbox"></i> Yêu cầu linh kiện từ kho</h2>
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newRequestModal">
-                        <i class="fas fa-plus"></i> Tạo yêu cầu mới
-                    </button>
-                </div>
-
                 <!-- Success/Error Messages -->
                 <c:if test="${not empty sessionScope.successMessage}">
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -109,7 +103,8 @@
                 <ul class="nav nav-tabs mb-4" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" data-bs-toggle="tab" href="#myRequests">
-                            <i class="fas fa-list"></i> Yêu cầu của tôi <span class="badge bg-primary ms-1">0</span>
+                            <i class="fas fa-list"></i> Yêu cầu của tôi 
+                            <span class="badge bg-primary ms-1">${myRequests != null ? myRequests.size() : 0}</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -153,14 +148,16 @@
                                                 <c:otherwise>
                                                     <c:forEach var="req" items="${myRequests}">
                                                         <tr>
-                                                            <td><strong>PR-${req.requestId}</strong></td>
-                                                            <td>${req.ticketNumber}</td>
-                                                            <td>${req.requestDate}</td>
-                                                            <td><span class="badge bg-info">${req.itemCount} loại</span></td>
+                                                            <td><strong>${req.requestNumber != null ? req.requestNumber : 'PR-'.concat(req.requestId)}</strong></td>
+                                                            <td>${req.ticketCode != null ? req.ticketCode : req.ticketNumber}</td>
+                                                            <td>
+                                                                <fmt:formatDate value="${req.requestDate}" pattern="dd/MM/yyyy HH:mm" />
+                                                            </td>
+                                                            <td><span class="badge bg-info">${req.itemCount != null ? req.itemCount : 0} loại</span></td>
                                                             <td>
                                                                 <c:choose>
                                                                     <c:when test="${req.status == 'PENDING'}">
-                                                                        <span class="badge bg-warning">Chờ duyệt</span>
+                                                                        <span class="badge bg-warning text-dark">Chờ duyệt</span>
                                                                     </c:when>
                                                                     <c:when test="${req.status == 'APPROVED'}">
                                                                         <span class="badge bg-success">Đã duyệt</span>
@@ -168,15 +165,25 @@
                                                                     <c:when test="${req.status == 'REJECTED'}">
                                                                         <span class="badge bg-danger">Từ chối</span>
                                                                     </c:when>
-                                                                    <c:when test="${req.status == 'COMPLETED'}">
-                                                                        <span class="badge bg-primary">Hoàn tất</span>
+                                                                    <c:when test="${req.status == 'FULFILLED'}">
+                                                                        <span class="badge bg-primary">Đã xuất kho</span>
                                                                     </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="badge bg-secondary">${req.status}</span>
+                                                                    </c:otherwise>
                                                                 </c:choose>
                                                             </td>
                                                             <td>
                                                                 <c:choose>
-                                                                    <c:when test="${not empty req.approvedBy}">
-                                                                        ${req.approverName}
+                                                                    <c:when test="${not empty req.warehouseStaffId and req.warehouseStaffId > 0}">
+                                                                        <c:choose>
+                                                                            <c:when test="${not empty req.warehouseStaff}">
+                                                                                ${req.warehouseStaff.fullName}
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                ID: ${req.warehouseStaffId}
+                                                                            </c:otherwise>
+                                                                        </c:choose>
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <span class="text-muted">-</span>
@@ -210,22 +217,13 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Đơn bảo hành <span class="text-danger">*</span></label>
-                                            <select class="form-select" name="ticketId" required>
+                                            <select class="form-select" id="ticketId" name="ticketId" required>
                                                 <option value="">-- Chọn đơn bảo hành --</option>
                                                 <c:forEach var="ticket" items="${myTickets}">
                                                     <option value="${ticket.ticketId}">
                                                         ${ticket.ticketNumber} - ${ticket.productSerial.product.productName} - ${ticket.status}
                                                     </option>
                                                 </c:forEach>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Mức độ ưu tiên</label>
-                                            <select class="form-select" name="priority">
-                                                <option value="LOW">Thấp</option>
-                                                <option value="MEDIUM" selected>Trung bình</option>
-                                                <option value="HIGH">Cao</option>
-                                                <option value="URGENT">Khẩn cấp</option>
                                             </select>
                                         </div>
                                     </div>
@@ -288,9 +286,6 @@
                                     <div class="d-grid gap-2">
                                         <button type="submit" class="btn btn-success btn-lg">
                                             <i class="fas fa-paper-plane"></i> Gửi yêu cầu tới kho
-                                        </button>
-                                        <button type="reset" class="btn btn-outline-secondary">
-                                            <i class="fas fa-redo"></i> Làm mới
                                         </button>
                                     </div>
                                 </form>
@@ -397,22 +392,42 @@
         }
 
         document.getElementById('newRequestForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            console.log('========== FORM SUBMIT TRIGGERED ==========');
             
+            // Validate form
+            const ticketId = document.getElementById('ticketId').value;
+            console.log('Ticket ID:', ticketId);
+            if (!ticketId) {
+                e.preventDefault();
+                alert('Vui lòng chọn đơn bảo hành!');
+                return false;
+            }
+            
+            // Check if at least one part is added and has valid data
+            const partNames = document.querySelectorAll('input[name="partName[]"]');
+            let validParts = 0;
+            partNames.forEach(input => {
+                if (input.value.trim() !== '') {
+                    validParts++;
+                }
+            });
+            
+            console.log('Valid parts count:', validParts);
+            if (validParts === 0) {
+                e.preventDefault();
+                alert('Vui lòng thêm ít nhất 1 linh kiện!');
+                return false;
+            }
+            
+            // Show loading state
             const btn = this.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
-
-            setTimeout(() => {
-                alert('Đã gửi yêu cầu thành công!\nKho sẽ xử lý yêu cầu của bạn.');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                this.reset();
-                
-                // Switch to my requests tab
-                document.querySelector('a[href="#myRequests"]').click();
-            }, 1500);
+            
+            console.log('Form is valid, submitting to server...');
+            console.log('Action:', this.action);
+            console.log('Method:', this.method);
+            // Let form submit naturally to servlet
         });
     </script>
 </body>

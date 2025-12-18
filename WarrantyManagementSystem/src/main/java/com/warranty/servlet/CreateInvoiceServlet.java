@@ -4,6 +4,7 @@ import com.warranty.dao.RepairTicketDAO;
 import com.warranty.dao.InvoiceDAO;
 import com.warranty.dao.PartsRequestDAO;
 import com.warranty.dao.RepairProgressLogDAO;
+import com.warranty.service.RepairTicketService;
 import com.warranty.model.RepairTicket;
 import com.warranty.model.Invoice;
 import com.warranty.model.PartsRequest;
@@ -32,6 +33,7 @@ import java.util.Set;
 @WebServlet("/technician/create-invoice")
 public class CreateInvoiceServlet extends HttpServlet {
     private RepairTicketDAO repairTicketDAO = new RepairTicketDAO();
+    private RepairTicketService repairTicketService = new RepairTicketService();
     private InvoiceDAO invoiceDAO = new InvoiceDAO();
     private PartsRequestDAO partsRequestDAO = new PartsRequestDAO();
     private RepairProgressLogDAO progressLogDAO = new RepairProgressLogDAO();
@@ -67,13 +69,29 @@ public class CreateInvoiceServlet extends HttpServlet {
         }
         System.out.println("DEBUG - Unique ticket IDs: " + ticketIds.size());
         
-        // Load thông tin chi tiết của từng ticket
+        // Load thông tin chi tiết của từng ticket (dùng Service để auto-load Customer và ProductSerial)
         List<RepairTicket> completedTickets = new ArrayList<>();
         for (Integer ticketId : ticketIds) {
-            RepairTicket ticket = repairTicketDAO.getTicketById(ticketId);
+            RepairTicket ticket = repairTicketService.getTicketById(ticketId);
             if (ticket != null) {
                 completedTickets.add(ticket);
                 System.out.println("  - Loaded ticket: " + ticket.getTicketNumber());
+                System.out.println("    Ticket object: " + ticket);
+                System.out.println("    Customer object: " + ticket.getCustomer());
+                System.out.println("    Customer is null? " + (ticket.getCustomer() == null));
+                if (ticket.getCustomer() != null) {
+                    System.out.println("    Customer ID: " + ticket.getCustomer().getCustomerId());
+                    System.out.println("    Customer Name: " + ticket.getCustomer().getFullName());
+                }
+                System.out.println("    ProductSerial object: " + ticket.getProductSerial());
+                System.out.println("    ProductSerial is null? " + (ticket.getProductSerial() == null));
+                if (ticket.getProductSerial() != null) {
+                    System.out.println("    Serial Number: " + ticket.getProductSerial().getSerialNumber());
+                    System.out.println("    Product object: " + ticket.getProductSerial().getProduct());
+                    if (ticket.getProductSerial().getProduct() != null) {
+                        System.out.println("    Product Name: " + ticket.getProductSerial().getProduct().getProductName());
+                    }
+                }
             }
         }
         
@@ -175,6 +193,12 @@ public class CreateInvoiceServlet extends HttpServlet {
             
             System.out.println("Invoice found: INV-" + invoice.getInvoiceId());
             System.out.println("Ticket: " + invoice.getTicketNumber());
+            
+            // Load RepairTicket để lấy thông tin sản phẩm và khách hàng
+            RepairTicket ticket = null;
+            if (invoice.getTicketId() > 0) {
+                ticket = repairTicketService.getTicketById(invoice.getTicketId());
+            }
 
             // Create Excel workbook
             Workbook workbook = new XSSFWorkbook();
@@ -210,6 +234,20 @@ public class CreateInvoiceServlet extends HttpServlet {
             createRow(sheet, rowNum++, "Mã đơn BH:", invoice.getTicketNumber(), boldStyle, null);
             createRow(sheet, rowNum++, "Ngày tạo:", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(invoice.getCreatedAt()), boldStyle, null);
             createRow(sheet, rowNum++, "Người tạo:", invoice.getCreatorName(), boldStyle, null);
+            
+            // Thông tin sản phẩm và khách hàng
+            String productName = "N/A";
+            String customerName = "N/A";
+            if (ticket != null) {
+                if (ticket.getProductSerial() != null && ticket.getProductSerial().getProduct() != null) {
+                    productName = ticket.getProductSerial().getProduct().getProductName();
+                }
+                if (ticket.getCustomer() != null) {
+                    customerName = ticket.getCustomer().getFullName();
+                }
+            }
+            createRow(sheet, rowNum++, "Sản phẩm:", productName, boldStyle, null);
+            createRow(sheet, rowNum++, "Khách hàng:", customerName, boldStyle, null);
 
             rowNum++; // Empty row
 
@@ -221,7 +259,7 @@ public class CreateInvoiceServlet extends HttpServlet {
             headerRow.getCell(1).setCellStyle(boldStyle);
 
             Row laborRow = sheet.createRow(rowNum++);
-            laborRow.createCell(0).setCellValue("Chi phí nhân công");
+            laborRow.createCell(0).setCellValue("Phí dịch vụ");
             Cell laborCell = laborRow.createCell(1);
             laborCell.setCellValue(invoice.getLaborCost().doubleValue());
             laborCell.setCellStyle(currencyStyle);

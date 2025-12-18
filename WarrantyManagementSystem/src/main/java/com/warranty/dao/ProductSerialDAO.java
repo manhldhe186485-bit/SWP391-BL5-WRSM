@@ -1,6 +1,7 @@
 package com.warranty.dao;
 
 import com.warranty.model.ProductSerial;
+import com.warranty.model.Product;
 import com.warranty.util.DatabaseUtil;
 import java.sql.*;
 import java.time.LocalDate;
@@ -38,8 +39,19 @@ public class ProductSerialDAO {
                 ps.setNotes(rs.getString("notes"));
                 ps.setCreatedAt(rs.getTimestamp("created_at"));
                 
+                // Load Product object if available
+                String productName = rs.getString("product_name");
+                if (productName != null && ps.getProductId() > 0) {
+                    Product product = new Product();
+                    product.setProductId(ps.getProductId());
+                    product.setProductName(productName);
+                    product.setCategory(rs.getString("category"));
+                    product.setBrand(rs.getString("brand"));
+                    ps.setProduct(product);
+                }
+                
                 // Additional info
-                ps.setProductName(rs.getString("product_name"));
+                ps.setProductName(productName);
                 ps.setCustomerName(rs.getString("customer_name"));
                 ps.setCustomerPhone(rs.getString("customer_phone"));
                 ps.setCustomerEmail(rs.getString("customer_email"));
@@ -79,8 +91,19 @@ public class ProductSerialDAO {
                 ps.setNotes(rs.getString("notes"));
                 ps.setCreatedAt(rs.getTimestamp("created_at"));
                 
+                // Load Product object if available
+                String productName = rs.getString("product_name");
+                if (productName != null && ps.getProductId() > 0) {
+                    Product product = new Product();
+                    product.setProductId(ps.getProductId());
+                    product.setProductName(productName);
+                    product.setCategory(rs.getString("category"));
+                    product.setBrand(rs.getString("brand"));
+                    ps.setProduct(product);
+                }
+                
                 // Additional info
-                ps.setProductName(rs.getString("product_name"));
+                ps.setProductName(productName);
                 ps.setCustomerName(rs.getString("customer_name"));
                 ps.setCustomerPhone(rs.getString("customer_phone"));
                 ps.setCustomerEmail(rs.getString("customer_email"));

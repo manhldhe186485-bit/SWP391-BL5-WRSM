@@ -74,7 +74,7 @@ public class AdminDashboardServlet extends HttpServlet {
     }
     
     private int getTotalWarrantyTickets() {
-        String sql = "SELECT COUNT(*) as total FROM warranty_tickets";
+        String sql = "SELECT COUNT(*) as total FROM repair_tickets";
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {

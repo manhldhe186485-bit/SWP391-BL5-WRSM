@@ -19,6 +19,10 @@ public class PartsRequestItem {
 
     // Additional field for joined data
     private InventoryItem inventoryItem;
+    
+    // Temporary fields for creating request (before inventory item is created)
+    private String tempPartName;
+    private String tempPartCode;
 
     // Constructors
     public PartsRequestItem() {
@@ -131,29 +135,26 @@ public class PartsRequestItem {
         if (inventoryItem != null) {
             return inventoryItem.getItemName();
         }
-        return null;
+        return tempPartName;
     }
 
     public void setPartName(String partName) {
-        // Helper method - part name is set through inventoryItem object
-        // This is a no-op setter for compatibility
+        this.tempPartName = partName;
     }
 
     public String getPartNumber() {
         if (inventoryItem != null) {
             return inventoryItem.getItemCode();
         }
-        return null;
+        return tempPartCode;
     }
 
     public void setPartNumber(String partNumber) {
-        // Helper method - part number is set through inventoryItem object
-        // This is a no-op setter for compatibility
+        this.tempPartCode = partNumber;
     }
 
     public void setPartCode(String partCode) {
-        // Helper method - part code is handled through inventoryItem
-        // This is a no-op setter for compatibility
+        this.tempPartCode = partCode;
     }
 
     public int getQuantityAvailable() {

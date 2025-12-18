@@ -67,7 +67,7 @@ public class InvoiceDAO {
     public Invoice getInvoiceByTicketId(int ticketId) {
         String sql = "SELECT i.*, wt.ticket_number, u.full_name as creator_name " +
                      "FROM invoices i " +
-                     "LEFT JOIN warranty_tickets wt ON i.ticket_id = wt.ticket_id " +
+                     "LEFT JOIN repair_tickets wt ON i.ticket_id = wt.ticket_id " +
                      "LEFT JOIN users u ON i.created_by = u.user_id " +
                      "WHERE i.ticket_id = ?";
         
@@ -91,7 +91,7 @@ public class InvoiceDAO {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT i.*, wt.ticket_number, u.full_name as creator_name " +
                      "FROM invoices i " +
-                     "LEFT JOIN warranty_tickets wt ON i.ticket_id = wt.ticket_id " +
+                     "LEFT JOIN repair_tickets wt ON i.ticket_id = wt.ticket_id " +
                      "LEFT JOIN users u ON i.created_by = u.user_id " +
                      "ORDER BY i.created_at DESC";
         
@@ -112,7 +112,7 @@ public class InvoiceDAO {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT i.*, wt.ticket_number, u.full_name as creator_name " +
                      "FROM invoices i " +
-                     "LEFT JOIN warranty_tickets wt ON i.ticket_id = wt.ticket_id " +
+                     "LEFT JOIN repair_tickets wt ON i.ticket_id = wt.ticket_id " +
                      "LEFT JOIN users u ON i.created_by = u.user_id " +
                      "WHERE i.created_by = ? " +
                      "ORDER BY i.created_at DESC";
