@@ -69,16 +69,13 @@
                     <a href="${pageContext.request.contextPath}/technician/receive-product">
                         <i class="fas fa-inbox"></i> Nhận sản phẩm
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp" class="active">
+                    <a href="${pageContext.request.contextPath}/technician/my-tickets" class="active">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-warranty-slip.jsp">
-                        <i class="fas fa-file-medical"></i> Tạo phiếu BH
-                    </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/request-parts.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/request-parts">
                         <i class="fas fa-toolbox"></i> Yêu cầu linh kiện
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/update-progress">
                         <i class="fas fa-tasks"></i> Cập nhật tiến độ
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/create-invoice">

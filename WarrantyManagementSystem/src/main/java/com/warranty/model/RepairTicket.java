@@ -337,6 +337,21 @@ public class RepairTicket {
         }
     }
 
+    // Helper methods for JSP display
+    public String getProductName() {
+        if (productSerial != null && productSerial.getProduct() != null) {
+            return productSerial.getProduct().getProductName();
+        }
+        return "N/A";
+    }
+
+    public String getCustomerName() {
+        if (customer != null) {
+            return customer.getFullName();
+        }
+        return "N/A";
+    }
+
     @Override
     public String toString() {
         return "RepairTicket{" +

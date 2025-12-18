@@ -16,6 +16,7 @@ public class RepairProgressLog {
 
     // Additional fields for joined data
     private User technician;
+    private String technicianName;  // For direct name from SQL join
 
     // Constructors
     public RepairProgressLog() {
@@ -93,6 +94,20 @@ public class RepairProgressLog {
 
     public void setTechnician(User technician) {
         this.technician = technician;
+    }
+
+    public String getTechnicianName() {
+        if (technicianName != null) {
+            return technicianName;
+        }
+        if (technician != null) {
+            return technician.getFullName();
+        }
+        return "N/A";
+    }
+
+    public void setTechnicianName(String technicianName) {
+        this.technicianName = technicianName;
     }
 
     @Override

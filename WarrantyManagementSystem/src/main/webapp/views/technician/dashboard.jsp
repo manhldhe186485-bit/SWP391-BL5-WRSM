@@ -107,9 +107,6 @@
                     <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
                     </a>
-                    <a href="${pageContext.request.contextPath}/technician/create-diagnosis">
-                        <i class="fas fa-file-medical"></i> Tạo phiếu BH
-                    </a>
                     <a href="${pageContext.request.contextPath}/technician/request-parts">
                         <i class="fas fa-toolbox"></i> Yêu cầu linh kiện
                     </a>
@@ -198,17 +195,24 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp" 
+                                        <a href="${pageContext.request.contextPath}/technician/receive-product" 
+                                           class="btn btn-lg btn-outline-danger w-100 mb-3">
+                                            <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                                            Tiếp nhận sản phẩm BH
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="${pageContext.request.contextPath}/technician/my-tickets" 
                                            class="btn btn-lg btn-outline-primary w-100 mb-3">
                                             <i class="fas fa-list fa-2x d-block mb-2"></i>
                                             Xem đơn của tôi
                                         </a>
                                     </div>
                                     <div class="col-md-3">
-                                        <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp" 
+                                        <a href="${pageContext.request.contextPath}/technician/create-diagnosis" 
                                            class="btn btn-lg btn-outline-success w-100 mb-3">
                                             <i class="fas fa-edit fa-2x d-block mb-2"></i>
-                                            Cập nhật tiến độ
+                                            Tạo phiếu chẩn đoán
                                         </a>
                                     </div>
                                     <div class="col-md-3">

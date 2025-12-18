@@ -55,16 +55,16 @@
                     <a href="${pageContext.request.contextPath}/technician/dashboard">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/receive-product">
+                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                    </a>
+                    <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-warranty-slip.jsp">
-                        <i class="fas fa-file-medical"></i> Tạo phiếu BH
-                    </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/request-parts.jsp" class="active">
+                    <a href="${pageContext.request.contextPath}/technician/request-parts" class="active">
                         <i class="fas fa-toolbox"></i> Yêu cầu linh kiện
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/update-progress">
                         <i class="fas fa-tasks"></i> Cập nhật tiến độ
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/create-invoice">
@@ -87,6 +87,23 @@
                         <i class="fas fa-plus"></i> Tạo yêu cầu mới
                     </button>
                 </div>
+
+                <!-- Success/Error Messages -->
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${sessionScope.successMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <c:remove var="successMessage" scope="session"/>
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>${sessionScope.errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <c:remove var="errorMessage" scope="session"/>
+                </c:if>
 
                 <!-- Tabs -->
                 <ul class="nav nav-tabs mb-4" role="tablist">
@@ -124,12 +141,57 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="7" class="text-center text-muted py-4">
-                                                    <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                                                    Chưa có yêu cầu nào
-                                                </td>
-                                            </tr>
+                                            <c:choose>
+                                                <c:when test="${empty myRequests}">
+                                                    <tr>
+                                                        <td colspan="7" class="text-center text-muted py-4">
+                                                            <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                                            Chưa có yêu cầu nào
+                                                        </td>
+                                                    </tr>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:forEach var="req" items="${myRequests}">
+                                                        <tr>
+                                                            <td><strong>PR-${req.requestId}</strong></td>
+                                                            <td>${req.ticketNumber}</td>
+                                                            <td>${req.requestDate}</td>
+                                                            <td><span class="badge bg-info">${req.itemCount} loại</span></td>
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${req.status == 'PENDING'}">
+                                                                        <span class="badge bg-warning">Chờ duyệt</span>
+                                                                    </c:when>
+                                                                    <c:when test="${req.status == 'APPROVED'}">
+                                                                        <span class="badge bg-success">Đã duyệt</span>
+                                                                    </c:when>
+                                                                    <c:when test="${req.status == 'REJECTED'}">
+                                                                        <span class="badge bg-danger">Từ chối</span>
+                                                                    </c:when>
+                                                                    <c:when test="${req.status == 'COMPLETED'}">
+                                                                        <span class="badge bg-primary">Hoàn tất</span>
+                                                                    </c:when>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty req.approvedBy}">
+                                                                        ${req.approverName}
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-muted">-</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-info" title="Xem chi tiết">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </tbody>
                                     </table>
                                 </div>
@@ -144,13 +206,17 @@
                                 <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Tạo yêu cầu linh kiện mới</h5>
                             </div>
                             <div class="card-body">
-                                <form id="newRequestForm">
+                                <form action="${pageContext.request.contextPath}/technician/request-parts" method="post" id="newRequestForm">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Đơn bảo hành <span class="text-danger">*</span></label>
                                             <select class="form-select" name="ticketId" required>
                                                 <option value="">-- Chọn đơn bảo hành --</option>
-                                                <!-- Will be populated from backend -->
+                                                <c:forEach var="ticket" items="${myTickets}">
+                                                    <option value="${ticket.ticketId}">
+                                                        ${ticket.ticketNumber} - ${ticket.productSerial.product.productName} - ${ticket.status}
+                                                    </option>
+                                                </c:forEach>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">

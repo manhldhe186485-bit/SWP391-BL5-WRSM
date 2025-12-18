@@ -424,6 +424,35 @@ public class RepairTicketDAO {
     }
 
     /**
+     * Get completed tickets by technician (for invoice creation)
+     */
+    public List<RepairTicket> getCompletedTicketsByTechnician(int technicianId) {
+        String sql = "SELECT * FROM repair_tickets WHERE assigned_technician_id = ? " +
+                    "AND status = 'COMPLETED' ORDER BY received_date DESC";
+        List<RepairTicket> tickets = new ArrayList<>();
+        
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, technicianId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                RepairTicket ticket = extractTicketFromResultSet(rs);
+                tickets.add(ticket);
+            }
+            
+            // Load related objects (ProductSerial, Customer)
+            loadRelatedObjects(tickets);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return tickets;
+    }
+
+    /**
      * Count active tickets by technician
      */
     public int countActiveTicketsByTechnician(int technicianId) {

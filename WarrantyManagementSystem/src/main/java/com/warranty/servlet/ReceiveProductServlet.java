@@ -38,13 +38,13 @@ public class ReceiveProductServlet extends HttpServlet {
         
         // Check authorization (Tech Manager or Admin)
         String role = (String) request.getSession().getAttribute("role");
-        if (role == null || (!role.equals("TECH_MANAGER") && !role.equals("ADMIN"))) {
+        if (role == null || (!role.equals("TECHNICIAN") && !role.equals("ADMIN"))) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         // Forward to receive product page
-        request.getRequestDispatcher("/views/tech-manager/receive-product.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/technician/receive-product.jsp").forward(request, response);
     }
 
     @Override
@@ -55,10 +55,17 @@ public class ReceiveProductServlet extends HttpServlet {
         String role = (String) request.getSession().getAttribute("role");
         Integer managerId = (Integer) request.getSession().getAttribute("userId");
         
-        if (role == null || (!role.equals("TECH_MANAGER") && !role.equals("ADMIN"))) {
+        // Debug log
+        System.out.println("DEBUG - Role from session: " + role);
+        System.out.println("DEBUG - UserId from session: " + managerId);
+        
+        if (role == null || (!role.equals("TECHNICIAN") && !role.equals("TECH_MANAGER") && !role.equals("ADMIN"))) {
+            System.out.println("DEBUG - Access denied, redirecting to login");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
+        System.out.println("DEBUG - Access granted, processing request");
 
         try {
             // ========== BƯỚC 1: LẤY THÔNG TIN TỪ FORM ==========
@@ -198,19 +205,19 @@ public class ReceiveProductServlet extends HttpServlet {
                     "Tiếp nhận thành công! Mã phiếu: " + ticketNumber + 
                     " - " + warrantyStatus);
                 
-                // Redirect to dashboard or assignment
-                response.sendRedirect(request.getContextPath() + "/tech-manager/dashboard");
+                // Redirect to technician dashboard
+                response.sendRedirect(request.getContextPath() + "/technician/dashboard");
             } else {
                 throw new Exception("Không thể tạo phiếu tiếp nhận!");
             }
 
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/views/tech-manager/receive-product.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/technician/receive-product.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            request.getRequestDispatcher("/views/tech-manager/receive-product.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/technician/receive-product.jsp").forward(request, response);
         }
     }
 

@@ -87,16 +87,16 @@
                     <a href="${pageContext.request.contextPath}/technician/dashboard">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/my-tickets.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/receive-product">
+                        <i class="fas fa-inbox"></i> Nhận sản phẩm
+                    </a>
+                    <a href="${pageContext.request.contextPath}/technician/my-tickets">
                         <i class="fas fa-clipboard-list"></i> Đơn của tôi
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/create-warranty-slip.jsp">
-                        <i class="fas fa-file-medical"></i> Tạo phiếu BH
-                    </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/request-parts.jsp">
+                    <a href="${pageContext.request.contextPath}/technician/request-parts">
                         <i class="fas fa-toolbox"></i> Yêu cầu linh kiện
                     </a>
-                    <a href="${pageContext.request.contextPath}/views/technician/update-progress.jsp" class="active">
+                    <a href="${pageContext.request.contextPath}/technician/update-progress" class="active">
                         <i class="fas fa-tasks"></i> Cập nhật tiến độ
                     </a>
                     <a href="${pageContext.request.contextPath}/technician/create-invoice">
@@ -130,7 +130,16 @@
                             <div class="card-body">
                                 <select class="form-select" id="ticketSelect">
                                     <option value="">-- Chọn đơn bảo hành --</option>
-                                    <!-- Will be populated from backend -->
+                                    <c:forEach var="ticket" items="${myTickets}">
+                                        <option value="${ticket.ticketId}"
+                                                data-ticket-number="${ticket.ticketNumber}"
+                                                data-customer="${ticket.customerName}"
+                                                data-product="${ticket.productName}"
+                                                data-issue="${ticket.issueDescription}"
+                                                data-status="${ticket.status}">
+                                            ${ticket.ticketNumber} - ${ticket.productName}
+                                        </option>
+                                    </c:forEach>
                                 </select>
                                 
                                 <div class="mt-3 d-none" id="ticketInfo">
@@ -167,20 +176,23 @@
                                 <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Thêm cập nhật mới</h5>
                             </div>
                             <div class="card-body">
-                                <form id="updateForm">
+                                <form id="updateForm" action="${pageContext.request.contextPath}/technician/update-progress" method="post">
+                                    <!-- Hidden field for ticket ID -->
+                                    <input type="hidden" name="ticketId" id="hiddenTicketId" value="">
+                                    
                                     <div class="mb-3">
                                         <label class="form-label">Trạng thái <span class="text-danger">*</span></label>
                                         <select class="form-select" name="status" required>
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="RECEIVED">Đã tiếp nhận</option>
-                                            <option value="DIAGNOSING">Đang chẩn đoán</option>
-                                            <option value="WAITING_APPROVAL">Chờ khách duyệt báo giá</option>
+                                            <option value="ASSIGNED">Đã giao việc</option>
+                                            <option value="IN_DIAGNOSIS">Đang chẩn đoán</option>
+                                            <option value="IN_PROGRESS">Đang sửa chữa</option>
                                             <option value="WAITING_PARTS">Chờ linh kiện</option>
-                                            <option value="REPAIRING">Đang sửa chữa</option>
-                                            <option value="TESTING">Đang kiểm tra</option>
+                                            <option value="IN_REPAIR">Đang lắp ráp/kiểm tra</option>
                                             <option value="COMPLETED">Hoàn thành</option>
-                                            <option value="WAITING_CUSTOMER">Chờ khách nhận</option>
+                                            <option value="CANCELLED">Hủy bỏ</option>
                                         </select>
+                                        <small class="text-muted">Lưu ý: Tuân theo trình tự: ASSIGNED → IN_DIAGNOSIS → IN_PROGRESS → WAITING_PARTS (nếu cần) → IN_REPAIR → COMPLETED</small>
                                     </div>
 
                                     <div class="mb-3">
@@ -296,38 +308,91 @@
 
         // Form submission
         document.getElementById('updateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            const ticketId = document.getElementById('ticketSelect').value;
             
-            if (!document.getElementById('ticketSelect').value) {
+            if (!ticketId) {
+                e.preventDefault();
                 alert('Vui lòng chọn đơn bảo hành!');
-                return;
+                return false;
             }
 
+            // Set ticket ID to hidden field
+            document.getElementById('hiddenTicketId').value = ticketId;
+            
+            // Validate description
+            const description = this.querySelector('textarea[name="description"]').value.trim();
+            if (!description) {
+                e.preventDefault();
+                alert('Vui lòng nhập mô tả chi tiết!');
+                return false;
+            }
+            
             // Show loading
             const btn = this.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
-
-            // Simulate API call
-            setTimeout(() => {
-                alert('Cập nhật tiến độ thành công!');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-                this.reset();
-            }, 1500);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+            }
+            
+            // Form will submit normally to server
+            return true;
         });
 
         // Ticket selection
         document.getElementById('ticketSelect').addEventListener('change', function() {
             const ticketInfo = document.getElementById('ticketInfo');
+            const selectedOption = this.options[this.selectedIndex];
+            
             if (this.value) {
+                // Get data from selected option
+                const customer = selectedOption.getAttribute('data-customer') || 'N/A';
+                const product = selectedOption.getAttribute('data-product') || 'N/A';
+                const issue = selectedOption.getAttribute('data-issue') || 'Không có mô tả';
+                const status = selectedOption.getAttribute('data-status') || 'UNKNOWN';
+                
+                // Update display
+                document.getElementById('customerName').textContent = customer;
+                document.getElementById('productName').textContent = product;
+                document.getElementById('issue').textContent = issue;
+                
+                // Update status badge
+                const statusBadge = document.getElementById('status');
+                statusBadge.textContent = getStatusText(status);
+                statusBadge.className = 'badge ' + getStatusClass(status);
+                
+                // Show ticket info
                 ticketInfo.classList.remove('d-none');
-                // Load ticket info from backend
             } else {
                 ticketInfo.classList.add('d-none');
             }
         });
+        
+        // Helper functions for status display
+        function getStatusText(status) {
+            const statusMap = {
+                'PENDING': 'Chờ xử lý',
+                'ASSIGNED': 'Đã giao',
+                'IN_PROGRESS': 'Đang sửa',
+                'WAITING_PARTS': 'Chờ linh kiện',
+                'COMPLETED': 'Hoàn thành',
+                'DELIVERED': 'Đã giao',
+                'CANCELLED': 'Đã hủy'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function getStatusClass(status) {
+            const classMap = {
+                'PENDING': 'bg-secondary',
+                'ASSIGNED': 'bg-info',
+                'IN_PROGRESS': 'bg-warning text-dark',
+                'WAITING_PARTS': 'bg-danger',
+                'COMPLETED': 'bg-success',
+                'DELIVERED': 'bg-primary',
+                'CANCELLED': 'bg-dark'
+            };
+            return classMap[status] || 'bg-secondary';
+        }
     </script>
 </body>
 </html>

@@ -1,8 +1,10 @@
 package com.warranty.servlet;
 
 import com.warranty.dao.PartsRequestDAO;
+import com.warranty.dao.RepairTicketDAO;
 import com.warranty.model.PartsRequest;
 import com.warranty.model.PartsRequestItem;
+import com.warranty.model.RepairTicket;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,6 +23,7 @@ import java.util.List;
 public class RequestPartsServlet extends HttpServlet {
 
     private PartsRequestDAO partsRequestDAO = new PartsRequestDAO();
+    private RepairTicketDAO repairTicketDAO = new RepairTicketDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,9 +36,19 @@ public class RequestPartsServlet extends HttpServlet {
             return;
         }
 
+        Integer technicianId = (Integer) request.getSession().getAttribute("userId");
+        
+        // ========== LẤY DANH SÁCH ĐƠN BẢO HÀNH CỦA TECHNICIAN ==========
+        try {
+            List<RepairTicket> myTickets = repairTicketDAO.getTicketsByTechnician(technicianId);
+            request.setAttribute("myTickets", myTickets);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("myTickets", new ArrayList<>());
+        }
+        
         // ========== LẤY LỊCH SỬ YÊU CẦU CỦA TECHNICIAN ==========
         try {
-            Integer technicianId = (Integer) request.getSession().getAttribute("userId");
             List<PartsRequest> myRequests = partsRequestDAO.getRequestsByTechnician(technicianId);
             
             request.setAttribute("myRequests", myRequests);
